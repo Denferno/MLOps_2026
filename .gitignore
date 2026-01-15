@@ -5,3 +5,12 @@ experiments/results/
 .env
 .DS_Store
 *.egg-info/
+venv/
+data/
+*.pt
+*.ckpt
+*.h5
+
+# 4. Ignore Secrets ( Security Risk !)
+keys.json
+wandb/
