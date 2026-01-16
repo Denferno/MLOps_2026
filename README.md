@@ -5,6 +5,6 @@ For the course ML programming and ML OPs, provided by UvA.
 Contributors:
 Dennis Chan 
 Lawrence Lam 
-Ngawang Tsarong 
+Ngawang Tsarong 15157970
 Michael Dong 15804232
 
