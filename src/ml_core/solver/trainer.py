@@ -43,53 +43,34 @@ class Trainer:
         self.model.train()
 
         # reset epoch stats
-        self.train_loss = 0.0
-        self.train_correct = 0
-        self.train_total = 0
+        running_loss = 0.0
 
-        # for binary F1 (only used if num_classes == 2)
-        tp = fp = fn = 0
+        for image, label in dataloader:
 
-        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx}", leave=False):
-            image = image.to(self.device, non_blocking=True)
-            label = label.to(self.device, non_blocking=True).long()
+            # move data to the device
+            image = image.to(self.device)
+            label = label.to(self.device)
 
-            # 1) forward
+            # reset gradient
+            self.optimizer.zero_grad()
+
+            # forward
             output = self.model(image)
-
-            # 2) loss
+            
+            # compute loss
             loss = self.criterion(output, label)
 
-            # 3) backward + step
+            # backpropagation 
             loss.backward()
+
+            # optimization
             self.optimizer.step()
+            
+            running_loss += loss.item()
 
-            # 4) update loss
-            self.train_loss += loss.item()
-
-            # 5) predictions + accuracy
-            preds = torch.argmax(output, dim=1)  # [B]
-            self.train_correct += (preds == label).sum().item()
-            self.train_total += label.size(0)
-
-            # 6) F1 if binary
-            if output.size(1) == 2:
-                tp += ((preds == 1) & (label == 1)).sum().item()
-                fp += ((preds == 1) & (label == 0)).sum().item()
-                fn += ((preds == 0) & (label == 1)).sum().item()
-
-        # averages
-        avg_loss = self.train_loss / max(len(dataloader),1)
-        accuracy = self.train_correct / self.train_total
-
-        if output.size(1) == 2:
-            precision = tp / max(tp + fp, 1)
-            recall = tp / max(tp + fn, 1)
-            f1 = (2 * precision * recall) / max(precision + recall, 1e-12)
-        else:
-            f1 = 0.0  # keep simple for multi-class
-
-        return avg_loss, accuracy, f1
+        avg_loss = running_loss / len(dataloader)
+        return avg_loss, 0.0, 0.0
+ 
     
     def validate(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
         self.model.eval()
