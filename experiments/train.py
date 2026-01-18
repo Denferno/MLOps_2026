@@ -1,12 +1,12 @@
 import argparse
 import torch
 import torch.optim as optim
-# from ml_core.data import get_dataloaders
-# from ml_core.models import MLP
-# from ml_core.solver import Trainer
+from ml_core.data import get_dataloaders
+from ml_core.models import MLP
+from ml_core.solver import Trainer
 from ml_core.utils import load_config, seed_everything, setup_logger
 
-# logger = setup_logger("Experiment_Runner")
+logger = setup_logger("Experiment_Runner")
 
 def main(args):
     # 1. Load Config & Set Seed
@@ -14,12 +14,14 @@ def main(args):
     seed = seed_everything(0)
     
     # 2. Setup Device
-    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f'Your using {device}')
+
     # 3. Data
-    # train_loader, val_loader = get_dataloaders(config)
-    
+    train_loader, val_loader = get_dataloaders(config)
+
     # 4. Model
-    # model = MLP(...)
+    model = MLP()
     
     # 5. Optimizer
     # optimizer = optim.SGD(...)
