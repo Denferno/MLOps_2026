@@ -29,7 +29,14 @@ class Trainer:
         self.tracker = ExperimentTracker(experiment_name="Trainer_test", config=self.config)
         
         # TODO: Initialize metric calculation (like accuracy/f1-score) if needed
-        
+        self.train_loss = 0
+        self.train_correct = 0
+        self.train_total = 0
+
+        self.val_loss = 0
+        self.val_correct = 0
+        self.val_total = 0
+
 
     def train_epoch(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
         self.model.train()
