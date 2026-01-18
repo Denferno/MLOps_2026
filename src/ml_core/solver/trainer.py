@@ -26,9 +26,10 @@ class Trainer:
         self.criterion = nn.CrossEntropyLoss()
 
         # TODO: Initialize ExperimentTracker
-        self.tracker = None
+        self.tracker = ExperimentTracker(experiment_name="Trainer_test", config=self.config)
         
         # TODO: Initialize metric calculation (like accuracy/f1-score) if needed
+        
 
     def train_epoch(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
         self.model.train()
