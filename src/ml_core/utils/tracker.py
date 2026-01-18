@@ -23,6 +23,8 @@ class ExperimentTracker:
         with open(config_path, 'w') as file:
             yaml.dump(config, file)
 
+        self.writer = SummaryWriter(log_dir=str(self.run_dir / "tb"))
+
         # Initialize CSV
         self.csv_path = self.run_dir / "metrics.csv"
         self.csv_file = open(self.csv_path, "w", newline="")
@@ -41,9 +43,17 @@ class ExperimentTracker:
 
         # TODO: Log to TensorBoard
 
+        for key, value in metrics.items():
+            if isinstance(value, (int, float)):
+                self.writer.add_scalar(key, value, epoch)
+        self.writer.flush()
+
+        
+
 
     def get_checkpoint_path(self, filename: str) -> str:
         return str(self.run_dir / filename)
 
     def close(self):
+        self.writer.close()
         self.csv_file.close()
