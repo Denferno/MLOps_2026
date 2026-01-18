@@ -106,12 +106,20 @@ class Trainer:
 
         avg_loss = self.val_loss / len(dataloader)
         accuracy = correct_pred / total_pred
+        f1 = f1_score(label.data,total_pred)
 
-        return avg_loss, accuracy
+        return avg_loss, accuracy,f1
 
     def save_checkpoint(self, epoch: int, val_loss: float) -> None:
         # TODO: Save model state, optimizer state, and config
-        pass
+        checkpoints = {
+            "epoch": epoch,
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "val_loss": float(val_loss),
+            "config": self.config,
+        }
+        torch.save(checkpoints, "checkpoint.pt")
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
         epochs = self.config["training"]["epochs"]
