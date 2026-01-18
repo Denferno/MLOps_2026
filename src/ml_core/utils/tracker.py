@@ -42,14 +42,10 @@ class ExperimentTracker:
         self.csv_file.flush()
 
         # TODO: Log to TensorBoard
-
         for key, value in metrics.items():
             if isinstance(value, (int, float)):
                 self.writer.add_scalar(key, value, epoch)
         self.writer.flush()
-
-        
-
 
     def get_checkpoint_path(self, filename: str) -> str:
         return str(self.run_dir / filename)
