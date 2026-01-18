@@ -27,4 +27,10 @@ def load_config(path: str) -> Dict[str, Any]:
 def seed_everything(seed: int):
     """Ensures reproducibility across numpy, random, and torch."""
     # TODO: Set seeds for random, numpy, torch, and cuda
-    pass
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+    
