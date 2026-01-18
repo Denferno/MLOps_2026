@@ -45,7 +45,12 @@ class Trainer:
         # TODO: Implement Training Loop
         # 1. Iterate over dataloader
         # 2. Move data to device
+        for image, label in dataloader:
+            image = image.to(self.device)
+            label = label.to(self.device)
+        
         # 3. Forward pass, Calculate Loss
+        self.device.forward(x)
         # 4. Backward pass, Optimizer step
         # 5. Track metrics (Loss, Accuracy, F1)
         
