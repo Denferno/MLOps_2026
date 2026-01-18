@@ -1,6 +1,6 @@
 import time
 from typing import Any, Dict, Tuple
-
+from sklearn.metrics import f1_score
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -67,9 +67,18 @@ class Trainer:
             self.optimizer.step()
             
             running_loss += loss.item()
+        
+        preds = torch.argmax(output, dim=1)
+        all_pred.extend(preds.cpu().numpy())
+
+        self.train_correct += (preds == label).sum().item()
+        self.train_total += label.size(0)
 
         avg_loss = running_loss / len(dataloader)
-        return avg_loss, 0.0, 0.0
+        accuracy = self.train_correct / self.train_total
+        f1_score = f1_score(label.data, preds)
+        
+        return avg_loss, accuracy, f1_score
  
     
     def validate(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
@@ -82,7 +91,7 @@ class Trainer:
         self.val_total = 0
 
         with torch.no_grad:
-            for image, label in tqdm(dataloader):
+            for image, label in dataloader:
                 image = image.to(self.device)
                 label = label.to(self.device)
 
@@ -94,7 +103,7 @@ class Trainer:
                 _, pred = torch.max(output.data, 1)
                 total_pred += label.size(0)
                 correct_pred += (pred == label).sum().items()
-                
+
         avg_loss = self.val_loss / len(dataloader)
         accuracy = correct_pred / total_pred
 
