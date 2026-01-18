@@ -4,13 +4,14 @@ import torch.optim as optim
 # from ml_core.data import get_dataloaders
 # from ml_core.models import MLP
 # from ml_core.solver import Trainer
-# from ml_core.utils import load_config, seed_everything, setup_logger
+from ml_core.utils import load_config, seed_everything, setup_logger
 
 # logger = setup_logger("Experiment_Runner")
 
 def main(args):
     # 1. Load Config & Set Seed
-    # config = load_config(args.config)
+    config = load_config(args.config)
+    seed = seed_everything(0)
     
     # 2. Setup Device
     
