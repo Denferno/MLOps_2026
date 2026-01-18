@@ -24,7 +24,7 @@ def main(args):
     model = MLP()
     
     # 5. Optimizer
-    # optimizer = optim.SGD(...)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     
     # 6. Trainer & Fit
     # trainer = Trainer(...)
