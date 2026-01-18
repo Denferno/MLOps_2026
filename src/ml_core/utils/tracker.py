@@ -4,6 +4,8 @@ from typing import Any, Dict
 import yaml
 
 # TODO: Add TensorBoard Support
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
 
 class ExperimentTracker:
     def __init__(
@@ -16,6 +18,10 @@ class ExperimentTracker:
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         # TODO: Save config to yaml in run_dir
+        config_path = self.run_dir / 'config.yaml'
+
+        with open(config_path, 'w') as file:
+            yaml.dump(config, file)
 
         # Initialize CSV
         self.csv_path = self.run_dir / "metrics.csv"
@@ -23,17 +29,18 @@ class ExperimentTracker:
         self.csv_writer = csv.writer(self.csv_file)
         
         # Header (TODO: add the rest of things we want to track, loss, gradients, accuracy etc.)
-        self.csv_writer.writerow(["epoch"]) 
+        self.csv_writer.writerow(["epoch", "track", "loss", "gradients", "accuracy"]) 
 
     def log_metrics(self, epoch: int, metrics: Dict[str, float]):
         """
         Writes metrics to CSV (and TensorBoard).
         """
         # TODO: Write other useful metrics to CSV
-        self.csv_writer.writerow([epoch]) # Currently only logging epoch
+        self.csv_writer.writerow([epoch, metrics]) # Currently only logging epoch
         self.csv_file.flush()
 
         # TODO: Log to TensorBoard
+
 
     def get_checkpoint_path(self, filename: str) -> str:
         return str(self.run_dir / filename)
