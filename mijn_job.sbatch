@@ -8,6 +8,6 @@
 #SBATCH --time=02:00:00
 #SBATCH --output=traineroutput_%j.out
 
-cd /gpfs/home1/scur2278/MLOps_2026
-source /gpfs/home1/scur2278/my_venv/bin/activate
+cd MLOps_2026
+source my_venv/bin/activate
 python experiments/train.py --config experiments/configs/train_config.yaml
