@@ -19,15 +19,17 @@ def main(args):
 
     # 3. Data
     train_loader, val_loader = get_dataloaders(config)
-
+    
     # 4. Model
-    model = MLP()
+    model = MLP(
+        input_shape=config["data"]["input_shape"], hidden_units=config["model"]["hidden_units"], 
+        dropout_rate=config["model"]["dropout_rate"], num_classes=config["model"]["num_classes"])
     
     # 5. Optimizer
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     
     # 6. Trainer & Fit
-    trainer = Trainer()
+    trainer = Trainer(model=model, optimizer=optimizer, config=config, device=device)
     trainer.fit(train_loader, val_loader)
 
 if __name__ == "__main__":
