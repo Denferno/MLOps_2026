@@ -44,7 +44,7 @@ class Trainer:
 
         # reset epoch stats
         running_loss = 0.0
-
+        all_pred = []
         for image, label in dataloader:
 
             # move data to the device
