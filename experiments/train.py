@@ -27,9 +27,8 @@ def main(args):
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     
     # 6. Trainer & Fit
-    # trainer = Trainer(...)
-    # trainer.fit(...)
-    pass
+    trainer = Trainer()
+    trainer.fit(train_loader, val_loader)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a Simple MLP on PCAM")
