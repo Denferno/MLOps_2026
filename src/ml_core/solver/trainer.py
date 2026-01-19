@@ -76,9 +76,9 @@ class Trainer:
 
         avg_loss = running_loss / len(dataloader)
         accuracy = self.train_correct / self.train_total
-        f1_score = f1_score(label.data, preds)
+        f1 = f1_score(label.data, preds)
         
-        return avg_loss, accuracy, f1_score
+        return avg_loss, accuracy, f1
  
     
     def validate(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
@@ -108,7 +108,7 @@ class Trainer:
         accuracy = correct_pred / total_pred
         f1 = f1_score(label.data,total_pred)
 
-        return avg_loss, accuracy,f1
+        return avg_loss, accuracy, f1
 
     def save_checkpoint(self, epoch: int, val_loss: float) -> None:
         # TODO: Save model state, optimizer state, and config

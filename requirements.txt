@@ -13,3 +13,4 @@ pytest
 ruff
 pre-commit
 scikit-learn
+-e .
