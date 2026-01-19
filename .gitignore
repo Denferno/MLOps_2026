@@ -10,7 +10,7 @@ data/
 *.pt
 *.ckpt
 *.h5
-*.csv
+.sbatch
 
 # 4. Ignore Secrets ( Security Risk !)
 keys.json
