@@ -3,7 +3,7 @@
 
 ## Group Information
 * **Group Number:** [Your Group Number]
-* **Team Members:** [Member 1 Name/ID, Member 2 Name/ID, Member 3 Name/ID, Member 4 Name/ID, Member 5 Name/ID]
+* **Team Members:** [Lawrence 15277844, Member 2 Name/ID, Member 3 Name/ID, Member 4 Name/ID, Member 5 Name/ID]
 * **GitHub Repository:** [Link to your Group Repository]
 * **Base Setup Chosen from Assignment 1:** [Name of the group member whose repo was used as the foundation]
 
