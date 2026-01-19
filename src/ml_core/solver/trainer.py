@@ -1,6 +1,6 @@
 import time
 from typing import Any, Dict, Tuple
-
+from sklearn.metrics import f1_score
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -43,66 +43,83 @@ class Trainer:
         self.model.train()
 
         # reset epoch stats
-        self.train_loss = 0.0
-        self.train_correct = 0
-        self.train_total = 0
+        running_loss = 0.0
 
-        # for binary F1 (only used if num_classes == 2)
-        tp = fp = fn = 0
+        for image, label in dataloader:
 
-        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx}", leave=False):
-            image = image.to(self.device, non_blocking=True)
-            label = label.to(self.device, non_blocking=True).long()
+            # move data to the device
+            image = image.to(self.device)
+            label = label.to(self.device)
 
-            # 1) forward
-            logits = self.model(image)  # [B, C]
+            # reset gradient
+            self.optimizer.zero_grad()
 
-            # 2) loss
-            loss = self.criterion(logits, label)
+            # forward
+            output = self.model(image)
+            
+            # compute loss
+            loss = self.criterion(output, label)
 
-            # 3) backward + step
-            self.optimizer.zero_grad(set_to_none=True)
+            # backpropagation 
             loss.backward()
+
+            # optimization
             self.optimizer.step()
+            
+            running_loss += loss.item()
+        
+        preds = torch.argmax(output, dim=1)
+        all_pred.extend(preds.cpu().numpy())
 
-            # 4) update loss
-            self.train_loss += loss.item()
+        self.train_correct += (preds == label).sum().item()
+        self.train_total += label.size(0)
 
-            # 5) predictions + accuracy
-            preds = torch.argmax(logits, dim=1)  # [B]
-            self.train_correct += (preds == label).sum().item()
-            self.train_total += label.size(0)
-
-            # 6) F1 if binary
-            if logits.size(1) == 2:
-                tp += ((preds == 1) & (label == 1)).sum().item()
-                fp += ((preds == 1) & (label == 0)).sum().item()
-                fn += ((preds == 0) & (label == 1)).sum().item()
-
-        # averages
-        avg_loss = self.train_loss / max(len(dataloader), 1)
-        acc = self.train_correct / max(self.train_total, 1)
-
-        if logits.size(1) == 2:
-            precision = tp / max(tp + fp, 1)
-            recall = tp / max(tp + fn, 1)
-            f1 = (2 * precision * recall) / max(precision + recall, 1e-12)
-        else:
-            f1 = 0.0  # keep simple for multi-class
-
-        return avg_loss, acc, f1
+        avg_loss = running_loss / len(dataloader)
+        accuracy = self.train_correct / self.train_total
+        f1_score = f1_score(label.data, preds)
+        
+        return avg_loss, accuracy, f1_score
+ 
     
     def validate(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
         self.model.eval()
         
         # TODO: Implement Validation Loop
         # Remember: No gradients needed here
-        
-        raise NotImplementedError("Implement validate")
+        self.val_loss = 0.0
+        self.val_correct = 0
+        self.val_total = 0
+
+        with torch.no_grad:
+            for image, label in dataloader:
+                image = image.to(self.device)
+                label = label.to(self.device)
+
+                output = self.model(image)
+                loss = self.criterion(output, label)
+
+                self.val_loss = loss.item()
+
+                _, pred = torch.max(output.data, 1)
+                total_pred += label.size(0)
+                correct_pred += (pred == label).sum().items()
+
+        avg_loss = self.val_loss / len(dataloader)
+        accuracy = correct_pred / total_pred
+        f1 = f1_score(label.data,total_pred)
+
+        return avg_loss, accuracy,f1
 
     def save_checkpoint(self, epoch: int, val_loss: float) -> None:
         # TODO: Save model state, optimizer state, and config
-        pass
+        checkpoints = {
+            "epoch": epoch,
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "val_loss": float(val_loss),
+            "config": self.config,
+        }
+        torch.save(checkpoints, "checkpoint.pt")
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
         epochs = self.config["training"]["epochs"]
@@ -111,8 +128,21 @@ class Trainer:
         
         for epoch in range(epochs):
             # TODO: Call train_epoch and validate
+            train_avg_loss, train_acc, train_f1 = self.train_epoch(train_loader, epoch)
+            val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
             # TODO: Log metrics to tracker
+            self.tracker.log_metrics(
+                epoch,{'train_loss': train_avg_loss,
+                       'train_accuracy': train_acc,
+                       'train_f1': train_f1,
+                       'val_avg_loss':val_avg_loss,
+                       'val_accuracy': val_acc,
+                       'val_f1': val_f1
+                       }
+            ) 
             # TODO: Save checkpoints
-            pass
+            self.save_checkpoint(epoch, val_avg_loss)
+        self.tracker.close()
+        
             
 	# Remember to handle the trackers properly

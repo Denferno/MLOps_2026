@@ -33,4 +33,5 @@ def seed_everything(seed: int):
 
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
     
