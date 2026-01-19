@@ -48,8 +48,8 @@ class Trainer:
         total_samples = 0
         all_pred = []
         all_labels = []
-
-        for image, label in dataloader:
+        
+        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx+1}", leave=False, position=0):
 
             # move data to the device
             image = image.to(self.device)
@@ -69,9 +69,7 @@ class Trainer:
 
             # optimization
             self.optimizer.step()
-            
-            running_loss += loss.item()
-        
+                    
             batch_size = label.size(0)
             running_loss += loss.item() * batch_size
             total_samples += batch_size
@@ -84,7 +82,7 @@ class Trainer:
 
         avg_loss = running_loss / total_samples
         accuracy = total_correct / total_samples
-        f1 = f1_score(all_labels, all_pred)
+        f1 = f1_score(all_labels, all_pred, average='binary')
         
         return avg_loss, accuracy, f1
  
@@ -103,7 +101,7 @@ class Trainer:
         all_labels = []
 
         with torch.no_grad():
-            for image, label in dataloader:
+            for image, label in tqdm(dataloader, desc=f"Val {epoch_idx+1}", leave=False, position=0):
                 image = image.to(self.device)
                 label = label.to(self.device)
 
