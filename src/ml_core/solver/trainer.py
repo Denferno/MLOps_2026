@@ -128,8 +128,21 @@ class Trainer:
         
         for epoch in range(epochs):
             # TODO: Call train_epoch and validate
+            train_avg_loss, train_acc, train_f1 = self.train_epoch(train_loader, epoch)
+            val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
             # TODO: Log metrics to tracker
+            self.tracker.log_metrics(
+                epoch,{'train_loss': train_avg_loss,
+                       'train_accuracy': train_acc,
+                       'train_f1': train_f1,
+                       'val_avg_loss':val_avg_loss,
+                       'val_accuracy': val_acc,
+                       'val_f1': val_f1
+                       }
+            ) 
             # TODO: Save checkpoints
-            pass
+            self.save_checkpoint(epoch, val_avg_loss)
+        self.tracker.close()
+        
             
 	# Remember to handle the trackers properly
