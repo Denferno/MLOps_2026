@@ -44,7 +44,11 @@ class Trainer:
 
         # reset epoch stats
         running_loss = 0.0
+        total_correct = 0
+        total_samples = 0
         all_pred = []
+        all_labels = []
+
         for image, label in dataloader:
 
             # move data to the device
@@ -68,15 +72,19 @@ class Trainer:
             
             running_loss += loss.item()
         
-        preds = torch.argmax(output, dim=1)
-        all_pred.extend(preds.cpu().numpy())
+            batch_size = label.size(0)
+            running_loss += loss.item() * batch_size
+            total_samples += batch_size
 
-        self.train_correct += (preds == label).sum().item()
-        self.train_total += label.size(0)
+            preds = torch.argmax(output, dim=1)
+            total_correct += (preds == label).sum().item()
 
-        avg_loss = running_loss / len(dataloader)
-        accuracy = self.train_correct / self.train_total
-        f1 = f1_score(label.data, preds)
+            all_pred.extend(preds.cpu().numpy())
+            all_labels.extend(label.cpu().numpy())
+
+        avg_loss = running_loss / total_samples
+        accuracy = total_correct / total_samples
+        f1 = f1_score(all_labels, all_pred)
         
         return avg_loss, accuracy, f1
  
