@@ -1,0 +1,16 @@
+2026-01-19 18:39:16,430 - Experiment_Runner - INFO - Your using cuda
+Starting training for 5 epochs...
+Traceback (most recent call last):
+  File "/gpfs/home1/scur2278/MLOps_2026/experiments/train.py", line 40, in <module>
+    main(args)
+    ~~~~^^^^^^
+  File "/gpfs/home1/scur2278/MLOps_2026/experiments/train.py", line 33, in main
+    trainer.fit(train_loader, val_loader)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/gpfs/home1/scur2278/MLOps_2026/src/ml_core/solver/trainer.py", line 131, in fit
+    train_avg_loss, train_acc, train_f1 = self.train_epoch(train_loader, epoch)
+                                          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/gpfs/home1/scur2278/MLOps_2026/src/ml_core/solver/trainer.py", line 72, in train_epoch
+    all_pred.extend(preds.cpu().numpy())
+    ^^^^^^^^
+NameError: name 'all_pred' is not defined
