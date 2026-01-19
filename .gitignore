@@ -11,7 +11,9 @@ data/
 *.ckpt
 *.h5
 .sbatch
+.out
 
 # 4. Ignore Secrets ( Security Risk !)
 keys.json
 wandb/
+runs/*

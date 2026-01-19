@@ -44,8 +44,12 @@ class Trainer:
 
         # reset epoch stats
         running_loss = 0.0
+        total_correct = 0
+        total_samples = 0
         all_pred = []
-        for image, label in dataloader:
+        all_labels = []
+        
+        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx+1}", leave=False, position=0):
 
             # move data to the device
             image = image.to(self.device)
@@ -65,18 +69,20 @@ class Trainer:
 
             # optimization
             self.optimizer.step()
-            
-            running_loss += loss.item()
-        
-        preds = torch.argmax(output, dim=1)
-        all_pred.extend(preds.cpu().numpy())
+                    
+            batch_size = label.size(0)
+            running_loss += loss.item() * batch_size
+            total_samples += batch_size
 
-        self.train_correct += (preds == label).sum().item()
-        self.train_total += label.size(0)
+            preds = torch.argmax(output, dim=1)
+            total_correct += (preds == label).sum().item()
 
-        avg_loss = running_loss / len(dataloader)
-        accuracy = self.train_correct / self.train_total
-        f1 = f1_score(label.data, preds)
+            all_pred.extend(preds.cpu().numpy())
+            all_labels.extend(label.cpu().numpy())
+
+        avg_loss = running_loss / total_samples
+        accuracy = total_correct / total_samples
+        f1 = f1_score(all_labels, all_pred, average='binary')
         
         return avg_loss, accuracy, f1
  
@@ -86,27 +92,40 @@ class Trainer:
         
         # TODO: Implement Validation Loop
         # Remember: No gradients needed here
-        self.val_loss = 0.0
-        self.val_correct = 0
-        self.val_total = 0
 
-        with torch.no_grad:
-            for image, label in dataloader:
+        #Het verschil is dat validation geen learning doet en alleen testen. Ook heeft het geen gradient berekening. En zit het in eval mode 
+        running_loss = 0.0
+        total_correct = 0
+        total_samples = 0
+        all_pred = []
+        all_labels = []
+
+        with torch.no_grad():
+            for image, label in tqdm(dataloader, desc=f"Val {epoch_idx+1}", leave=False, position=0):
                 image = image.to(self.device)
                 label = label.to(self.device)
 
+                # dit is de forward
                 output = self.model(image)
+
+                # compute loss
                 loss = self.criterion(output, label)
+                
+                # hier zit dus geen backpropagation (in train_ep wel, dus gaat het niet leren
 
-                self.val_loss = loss.item()
+                batch_size = label.size(0)
+                running_loss += loss.item() * batch_size
+                total_samples += batch_size
 
-                _, pred = torch.max(output.data, 1)
-                total_pred += label.size(0)
-                correct_pred += (pred == label).sum().items()
+                preds = torch.argmax(output, dim=1)
+                total_correct += (preds == label).sum().item()
 
-        avg_loss = self.val_loss / len(dataloader)
-        accuracy = correct_pred / total_pred
-        f1 = f1_score(label.data,total_pred)
+                all_pred.extend(preds.cpu().numpy())
+                all_labels.extend(label.cpu().numpy())
+
+        avg_loss = running_loss / total_samples
+        accuracy = total_correct / total_samples
+        f1 = f1_score(all_labels, all_pred, average='binary')
 
         return avg_loss, accuracy, f1
 
