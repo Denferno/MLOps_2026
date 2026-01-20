@@ -31,14 +31,20 @@ class ExperimentTracker:
         self.csv_writer = csv.writer(self.csv_file)
         
         # Header (TODO: add the rest of things we want to track, loss, gradients, accuracy etc.)
-        self.csv_writer.writerow(["epoch", "track", "loss", "gradients", "accuracy"]) 
+        self.csv_writer.writerow(["epoch", "train_loss", "train_accuracy", "train_f1", "val_avg_loss","val_accuracy","val_f1","grad_norm",""]) 
 
     def log_metrics(self, epoch: int, metrics: Dict[str, float]):
         """
         Writes metrics to CSV (and TensorBoard).
         """
         # TODO: Write other useful metrics to CSV
-        self.csv_writer.writerow([epoch, metrics]) # Currently only logging epoch
+        row = [epoch]
+        for column in ["train_loss", "train_accuracy", "train_f1", 
+                      "val_avg_loss", "val_accuracy", "val_f1", 
+                      "grad_norm", "learning_rate"]:
+            row.append(metrics.get(column, ""))
+
+        self.csv_writer.writerow(row) # Currently only logging epoch
         self.csv_file.flush()
 
         # TODO: Log to TensorBoard
