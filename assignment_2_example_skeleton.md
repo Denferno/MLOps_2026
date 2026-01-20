@@ -24,6 +24,13 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
 
 2. **Control Measures:**
+   1. 
+
+   2. 
+
+   3.
+
+   4.
 
 3. **Code Snippets for Reproducibility:**
    ```python
@@ -49,14 +56,30 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
 ## Question 3: Configuration Management
 1. **Centralized Parameters:**
+1 Input_shape
+2 hidden_units
+3 dropout_rate
+4 num_classes
+5 learning_rate
 
 2. **Loading Mechanism:**
    - [Describe your use of YAML, Hydra, or Argparse.]
    ```python
    # Snippet showing how parameters are loaded
+   config = load_config(args.config)
+   model = MLP(
+        input_shape=config["data"]["input_shape"], hidden_units=config["model"]["hidden_units"], 
+        dropout_rate=config["model"]["dropout_rate"], num_classes=config["model"]["num_classes"])
    ```
+   Voor alle 5 opgenoemde parameters gebruiken wij een file genaamd train_config.yaml and config.yaml
 
 3. **Impact Analysis:**
+Reproducibility
+   Door het gebruik van een config file inplaats van hardcode. Blijven de parameters over alle files hetzelfde en voorkom je fouten zoals het gebruiken van verschillende values van parameters in verschillende files.
+Experiment comparison
+   Door het gebruik van een config file kan je makkelijk parameters veranderen om verschillende values te vergelijken.
+Collaboration
+   Iedereen gebruikt dezelfde parameters en het zorgt ervoor dat nieuwe deelnemers gelijk de juiste values gebruiken. Ook is het meer overzichtelijker als je een config file gebruikt en hoef je niet door de code te scrollen opzoek naar de juiste parameters value.
 
 4. **Remaining Risks:** 
 
