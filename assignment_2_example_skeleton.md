@@ -62,6 +62,10 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
 4. **Twin Run Results:**
 
+![identiek resultaat](img/metrics_dennis.png)
+
+![identiek resultaat](img/metrics_lawrence.png)
+
 ---
 
 ## Question 2: Data, Partitioning, and Leakage Audit
