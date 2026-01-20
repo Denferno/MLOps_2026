@@ -1,0 +1,11 @@
+Environment: Snellius HPC Cluster (int5.local.snellius.surf.nl)
+Partition: gpu_course
+
+CPU Model: AMD EPYC 7F72 24-Core Processor
+GPU Model: NVIDIA A100-SXM4-40GB
+cuDNN Version: 9.1.0.2
+Python Version: 3.13.1
+
+Training Script: experiments/train.py
+Config: experiments/configs/train_config.yaml
+Virtual Environment: $HOME/my_venv
