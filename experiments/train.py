@@ -11,7 +11,7 @@ logger = setup_logger("Experiment_Runner")
 def main(args):
     # 1. Load Config & Set Seed
     config = load_config(args.config)
-    seed = seed_everything(0)
+    seed = seed_everything(config['seed'])
     
     # 2. Setup Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
