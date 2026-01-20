@@ -12,6 +12,17 @@
 ## Question 1: Reproducibility Audit
 1. **Sources of Non-Determinism:**
 
+   1. Pytorch CUDA determinism (GPU)
+Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algoritmes voor de snelheid. Zelfs als we alle seeds erbij zetten kunnen sommige berekeningen toch net anders zijn waardoor het net een andere resultaat produceert. 
+
+   2. DataLoader "Shuffle" Probleem.
+   Dataloader die shuffelt (door shuffle=True) de data waardoor alle waardes een willekeurige waarde krijgen en dat zorgt ervoor dat het niet meer deterministisch is.
+
+   3. Verschillende CPUs en GPu maken de exact dezelfde berekingen maar net iets anders, omdat computers geen perfecte decimalen kunnen opslaan en ronden tussendoor ook af en daardoor kunnen later er verschillen ontstaan in de training en hierdoor is perfect identiek niet haalbaar.  
+
+   4. 
+
+
 2. **Control Measures:**
 
 3. **Code Snippets for Reproducibility:**
