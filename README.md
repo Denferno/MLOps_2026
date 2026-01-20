@@ -16,7 +16,7 @@ Downloading the right data:
 5. tar -xvf pcam_data.tar
 6. cd surfdrive
 7. mv camelyonpatch* ..
-8. Make sure that the data is inside the folder src/ml_core/data/camelyonpatch_level_2
+8. Remname your mlops_2026_pcam_data folder to camelyonpatch_level_2
 
 
 Instruction for running train.py.
