@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.utils as utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
+from torch.optim import lr_scheduler
 from ..utils import ExperimentTracker, setup_logger
 
 class Trainer:
@@ -28,6 +28,11 @@ class Trainer:
         # TODO: Initialize ExperimentTracker
         self.tracker = ExperimentTracker(experiment_name="Trainer_test", config=self.config)
         
+        self.scheduler = lr_scheduler.ReduceLROnPlateau(
+            self.optimizer, mode="min", factor=self.config["training"]["factor"], 
+            patience=self.config["training"]["patience"],
+            min_lr=self.config["training"]["min_lr"])
+
         # TODO: Initialize metric calculation (like accuracy/f1-score) if needed
         self.train_loss = 0.0
         self.train_correct = 0
@@ -154,12 +159,14 @@ class Trainer:
         
         print(f"Starting training for {epochs} epochs...")
         
-        for epoch in range(epochs):
+        for epoch in range(epochs):           
             # TODO: Call train_epoch and validate
             train_avg_loss, train_acc, train_f1, grad_norm = self.train_epoch(train_loader, epoch)
             val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
             # TODO: Log metrics to tracker
-
+            current_lr = self.optimizer.param_groups[0]['lr']
+            self.scheduler.step(val_avg_loss)
+            
 
             print(f"Epoch {epoch+1:3d}/{epochs} | "
                 f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} Grad={grad_norm:.3f}| "
@@ -171,7 +178,8 @@ class Trainer:
                        'val_avg_loss':val_avg_loss,
                        'val_accuracy': val_acc,
                        'val_f1': val_f1,
-                       'grad_norm': grad_norm
+                       'grad_norm': grad_norm,
+                       'learning_rate': current_lr
                        }
             ) 
             # TODO: Save checkpoints
