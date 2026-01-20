@@ -3,7 +3,7 @@
 
 ## Group Information
 * **Group Number:** [25]
-* **Team Members:** [Member 1 Lawrence 15277844, Member 2 Michael Dong 15804232, Member 3 Name/ID, Member 4 Name/ID, Member 5 Name/ID]
+* **Team Members:** [Member 1 Lawrence 15277844, Member 2 Michael Dong 15804232, Member 3 Dennis Chan 15833526, Member 4 Ngawang Tsarong 15833526]
 * **GitHub Repository:** [https://github.com/Denferno/MLOps_2026]
 * **Base Setup Chosen from Assignment 1:** [Dennis Chan]
 
