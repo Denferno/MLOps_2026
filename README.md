@@ -8,7 +8,16 @@ Lawrence Lam 15277844
 Ngawang Tsarong 15157970
 Michael Dong 15804232
 
-Klaar zetten voor het runnen van train.py.
+Downloading the right data:
+1. wget https://surfdrive.surf.nl/public.php/dav/files/wjRYtSborgbPF2P/?accept=zip -O pcam_data.tar src/ml_core/data
+2. cd #path
+3. unzip pcam_data.tar
+4. cd surfdrive
+5. tar -xvf pcam_data.tar
+6. Make sure that the data is inside the folder src/ml_core/data/camelyonpatch_level_2
+
+
+Instruction for running train.py.
 1. module purge
 2. module load 2025
 3. module load Python/3.13.1-GCCcore-14.2.0
