@@ -164,10 +164,13 @@ class Trainer:
             train_avg_loss, train_acc, train_f1, grad_norm = self.train_epoch(train_loader, epoch)
             val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
             # TODO: Log metrics to tracker
-            current_lr = self.optimizer.param_groups[0]['lr']
-            self.scheduler.step(val_avg_loss)
-            
 
+            lr_before = self.optimizer.param_groups[0]['lr']
+            self.scheduler.step(val_avg_loss)
+            lr_after = self.optimizer.param_groups[0]['lr']
+
+            if lr_before != lr_after:
+                print(f'learning rate reduced from {lr_before} to {lr_after}')
             print(f"Epoch {epoch+1:3d}/{epochs} | "
                 f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} Grad={grad_norm:.3f}| "
                 f"Val: L={val_avg_loss:.4f} A={val_acc*100:5.2f}% F1={val_f1:.3f}")
@@ -179,7 +182,7 @@ class Trainer:
                        'val_accuracy': val_acc,
                        'val_f1': val_f1,
                        'grad_norm': grad_norm,
-                       'learning_rate': current_lr
+                       'learning_rate': lr_after 
                        }
             ) 
             # TODO: Save checkpoints
