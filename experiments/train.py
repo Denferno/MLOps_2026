@@ -26,7 +26,7 @@ def main(args):
         dropout_rate=config["model"]["dropout_rate"], num_classes=config["model"]["num_classes"])
     
     # 5. Optimizer
-    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=config["training"]["learning_rate"], momentum=config["training"].get("momentum", 0.9))
     
     # 6. Trainer & Fit
     trainer = Trainer(model=model, optimizer=optimizer, config=config, device=device)
