@@ -82,7 +82,7 @@ Collaboration
    Iedereen gebruikt dezelfde parameters en het zorgt ervoor dat nieuwe deelnemers gelijk de juiste values gebruiken. Ook is het meer overzichtelijker als je een config file gebruikt en hoef je niet door de code te scrollen opzoek naar de juiste parameters value.
 
 4. **Remaining Risks:** 
-
+Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk geen fixed parameter gebruiken of te late set_seeds. Verder lost het niet alle non-determenism problem op.
 ---
 
 ## Question 4: Gradients & LR Scheduler
