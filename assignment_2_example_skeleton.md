@@ -20,7 +20,7 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
    3. Verschillende CPUs en GPu maken de exact dezelfde berekingen maar net iets anders, omdat computers geen perfecte decimalen kunnen opslaan en ronden tussendoor ook af en daardoor kunnen later er verschillen ontstaan in de training en hierdoor is perfect identiek niet haalbaar.  
 
-   4. 
+   4. Omdat num_workers=2 meerdere processen gebruikt, heeft elke worker zijn eigen random state. Zonder worker-seeding kan de batchvolgorde/preprocessing per run nét verschillen, ook met dezelfde seed. Dat kan kleine verschillen in training en eindresultaat geven.
 
 
 2. **Control Measures:**
