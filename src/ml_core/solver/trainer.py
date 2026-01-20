@@ -3,6 +3,7 @@ from typing import Any, Dict, Tuple
 from sklearn.metrics import f1_score
 import torch
 import torch.nn as nn
+import torch.nn.utils as utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -38,6 +39,7 @@ class Trainer:
 
         self.accuracy = 0.0
         self.f1score = 0.0
+        self.gradient_norm = 0.0
 
     def train_epoch(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
         self.model.train()
@@ -49,7 +51,7 @@ class Trainer:
         all_pred = []
         all_labels = []
         
-        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx+1}", leave=False, position=0):
+        for image, label in tqdm(dataloader, desc=f"Train {epoch_idx+1}", leave=True, position=0):
 
             # move data to the device
             image = image.to(self.device)
@@ -67,6 +69,13 @@ class Trainer:
             # backpropagation 
             loss.backward()
 
+            # grad norm
+            total_norm = utils.clip_grad_norm_(
+                self.model.parameters(),
+                max_norm = self.config["training"]["max_grad_norm"],
+                norm_type = 2
+            )
+            grad_norm = total_norm.item()
             # optimization
             self.optimizer.step()
                     
@@ -77,14 +86,14 @@ class Trainer:
             preds = torch.argmax(output, dim=1)
             total_correct += (preds == label).sum().item()
 
-            all_pred.extend(preds.cpu().numpy())
+            all_pred.extend(preds.detach().cpu().numpy())
             all_labels.extend(label.cpu().numpy())
 
         avg_loss = running_loss / total_samples
         accuracy = total_correct / total_samples
         f1 = f1_score(all_labels, all_pred, average='binary')
         
-        return avg_loss, accuracy, f1
+        return avg_loss, accuracy, f1, grad_norm
  
     
     def validate(self, dataloader: DataLoader, epoch_idx: int) -> Tuple[float, float, float]:
@@ -147,13 +156,13 @@ class Trainer:
         
         for epoch in range(epochs):
             # TODO: Call train_epoch and validate
-            train_avg_loss, train_acc, train_f1 = self.train_epoch(train_loader, epoch)
+            train_avg_loss, train_acc, train_f1, grad_norm = self.train_epoch(train_loader, epoch)
             val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
             # TODO: Log metrics to tracker
 
 
             print(f"Epoch {epoch+1:3d}/{epochs} | "
-                f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} | "
+                f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} Grad={grad_norm:.3f}| "
                 f"Val: L={val_avg_loss:.4f} A={val_acc*100:5.2f}% F1={val_f1:.3f}")
             self.tracker.log_metrics(
                 epoch,{'train_loss': train_avg_loss,
@@ -161,7 +170,8 @@ class Trainer:
                        'train_f1': train_f1,
                        'val_avg_loss':val_avg_loss,
                        'val_accuracy': val_acc,
-                       'val_f1': val_f1
+                       'val_f1': val_f1,
+                       'grad_norm': grad_norm
                        }
             ) 
             # TODO: Save checkpoints
