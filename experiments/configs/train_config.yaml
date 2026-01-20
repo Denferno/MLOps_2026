@@ -8,6 +8,7 @@ data:
   input_shape: [3, 96, 96]
   batch_size: 32
   num_workers: 2
+  
 
 model:
   hidden_units: [64, 32]
@@ -19,3 +20,4 @@ training:
   learning_rate: 0.01
   momentum: 0.95
   save_dir: "./experiments/results"
+  max_grad_norm: 1.0
