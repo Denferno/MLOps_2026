@@ -4,7 +4,7 @@ from typing import Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import ast 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Plot training metrics.")
@@ -12,19 +12,15 @@ def parse_args():
     parser.add_argument("--output_dir", type=Path, default=None)
     return parser.parse_args()
 
-
 def load_data(file_path: Path) -> pd.DataFrame:
     # TODO: Load CSV into Pandas DataFrame
     df = pd.read_csv(file_path)
-    df.columns = ['epoch', 'train_loss', 'train_accuracy', 'train_f1', 'val_avg_loss', 'val_accuracy', 'val_f1', 'grad_norm', 'learning_rate']
+    df.columns = ['epoch', 'train_loss', 'train_accuracy', 'train_f1', 'val_avg_loss', 'val_accuracy', 'val_f1', 'avg_grad_norm', 'learning_rate','all_grads']
     return df
-
 
 def setup_style():
     # TODO: Set seaborn theme
     plt.style.use("default")
-
-
 
 def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     """
@@ -48,10 +44,20 @@ def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     axes[0, 1].set_title("Accuracy")
     axes[0, 1].legend()
 
-    # TODO: Plot Learning Rate 
-    axes[1, 0].plot(df["epoch"], df["learning_rate"], label="LR")
-    axes[1, 0].set_title("Learning Rate")
+    # TODO: Plot Gradient Norm
+    df["all_grads"] = df["all_grads"].apply(ast.literal_eval)
+
+    for i, all_grads in enumerate(df["all_grads"][:3]):
+        axes[1, 0].plot(range(len(all_grads)), all_grads, label=f"Epoch {i+1}")
+    axes[1, 0].set_title("Gradient Norm")
     axes[1, 0].legend()
+    
+    # TODO: Plot Learning Rate 
+    axes[1, 1].plot(df["epoch"], df["learning_rate"], label="LR")
+    axes[1, 1].set_title("Learning Rate")
+    axes[1, 1].legend()
+
+    
 
     # Hide empty subplot
     axes[1, 1].axis("off")
