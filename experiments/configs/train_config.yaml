@@ -10,9 +10,13 @@ data:
   num_workers: 4
 
 plot:
-  plot_seed_1: "experiments/results/Trainer_test/seed0_Jan21_20-37-18"
-  plot_seed_2: "experiments/results/Trainer_test/seed42_Jan21_19-45-54"
-  plot_seed_3: "experiments/results/Trainer_test/seed123_Jan21_20-39-53"
+  plot_seed_1: ""
+  plot_seed_2: ""
+  plot_seed_3: ""
+
+checkpoint:
+  checkpoint_source: 
+  checkpoint_check: Flase
 
 model:
   hidden_units: [64, 32]
