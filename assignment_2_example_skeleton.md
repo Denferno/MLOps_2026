@@ -15,11 +15,10 @@
    1. Pytorch CUDA determinism (GPU)
 Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algoritmes voor de snelheid. Zelfs als we alle seeds erbij zetten kunnen sommige berekeningen toch net anders zijn waardoor het net een andere resultaat produceert. 
 
-   2. Parallel Reduction Order
-   Hierbij worden getallen in een andere volgorde gecombineerd. Omdat floating point berekeningen niet associatief (dat betekent dat volgorde niet uitmaakt) is, kunnen afrondingsfouten ontstaan afhankelijk van de volgorde van bewerkingen. Dit leidt tot kleine verschillen in eindresultaten vergeleken met sequentiële uitvoering (links naar rechts).
+   2. DataLoader "Shuffle" Probleem.
+   Dataloader die shuffelt (door shuffle=True) de data waardoor alle waardes een willekeurige waarde krijgen en dat zorgt ervoor dat het niet meer deterministisch is.
 
-
-   3. Floating point, Verschillende CPUs en GPu maken de exact dezelfde berekingen maar net iets anders, omdat computers geen perfecte decimalen kunnen opslaan en ronden tussendoor ook af en daardoor kunnen later er verschillen ontstaan in de training en hierdoor is perfect identiek niet haalbaar.  
+   3. Verschillende CPUs en GPu maken de exact dezelfde berekingen maar net iets anders, omdat computers geen perfecte decimalen kunnen opslaan en ronden tussendoor ook af en daardoor kunnen later er verschillen ontstaan in de training en hierdoor is perfect identiek niet haalbaar.  
 
    4. Omdat num_workers=2 meerdere processen gebruikt, heeft elke worker zijn eigen random state. Zonder worker-seeding kan de batchvolgorde/preprocessing per run nét verschillen, ook met dezelfde seed. Dat kan kleine verschillen in training en eindresultaat geven.
 
@@ -70,15 +69,28 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
 ## Question 2: Data, Partitioning, and Leakage Audit
 1. **Partitioning Strategy:**
+We hebben gebruikgemaakt van al gedefinieerde Train, Validation en
+Test splits van de dataset. De data was op bestandsniveau gesplitst
+in afzonderlijke HDF5-bestanden per split.
+We hebben de predefined h5 splits gebruikt en geen shuffle of resplit
+
+Final counts for each split
+Train: 80
+Validation: 10
+Test: 10
 
 2. **Leakage Prevention:**
-   
+Voor geen data leakage hebben we gebruik gemaakt van onze voorgedefinieerde PCAM split waardoor we geen patient overlap hebben. Een patient kan dus niet in zowel de training als testset voorkomen. We hebben geen gebruik gemaakt van normalisatie. We gebruikten alleen transform.ToTensor() die dus per afbeelding de pixelwaarden van 0-255 naar 0.0-1.0 schaalt (delen door 255), zonder dat we dus gebruik maken van statistieken. Zo blijft ook onze testdata onbekend terein voor het model, waardoor het een eerlijke evaluatie kan geven.   
 3. **Cross-Validation Reflection:**
-
+K fold cross validation is handig maar hier niet per se nodig, omdat de dataset al best groot is en er al vaste splits geleverd zijn.
+Dit zorgt voor minder variantie tussen de splitsen en zorgt ook voor minder hoeveelheid aan processen die nodig zijn voor het trainen op verschillende folds.
+Met hyperparameter optimization is Train methode niet helemaal geschikt omdat de data er van al wordt gebruikt om te leren en daardoor de
+resultaten waarschijnlijk meer de positieve kant op gaan leunen. Test methode omdat die er is om het model te evalueren. De validation methode is dus de beste die er bij past omdat het model er van nog niet is bloodgesteld aan data waar al van geleerd is.
 4. **The Dataset Size Mystery:**
-
+In de originele PCAM wordt er HDF5 formaat gebruikt met betere compressie, terwijl er in de andere PNG/JPEG worden gebruikt met minder efficiente compressie. Daarnaast gebruikt HDF5 formaat chunked compression en cross file optimalisatie, terwijl PNG gebruik maakt van meer eenvoudige algoritmes. Ook heeft PNG/JPEG headers en metadeta waardoor de bestanden ook groter zijn, terwijl HDF5 dat niet heeft.
+Wat we kunnen doen ertegen is terug naar de formaat van HDF5 comprimeren.
 5. **Poisoning Analysis:**
-
+PCAM is dus aangepast om 
 ---
 
 ## Question 3: Configuration Management
@@ -109,7 +121,7 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
    Iedereen gebruikt dezelfde parameters en het zorgt ervoor dat nieuwe deelnemers gelijk de juiste values gebruiken. Ook is het meer overzichtelijker aangezien alles in één file zit. Zo hoeft je niet door de code te scrollen opzoek naar de juiste parameters value. Zo voorkom je dus ook inconsistente hard coded values
 
 4. **Remaining Risks:** 
-   Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk geen fixed parameter gebruiken of te late set_seeds. Verder lost het niet alle non-determenism problem op.
+Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk geen fixed parameter gebruiken of te late set_seeds. Verder lost het niet alle non-determenism problem op.
 ---
 
 ## Question 4: Gradients & LR Scheduler
