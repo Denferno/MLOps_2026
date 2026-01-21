@@ -9,11 +9,11 @@ data:
   batch_size: 64  
   num_workers: 4
 
-plot:
+plot: 
+  # Fill in before running plot_gradient_norm.py
   plot_seed_1: ""
   plot_seed_2: ""
   plot_seed_3: ""
-
   plot_learning_rate: ""
 
 checkpoint:

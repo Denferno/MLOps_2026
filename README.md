@@ -40,6 +40,7 @@ Instruction for running plot_gradient_norm.py:
 2. After this there are 3 folders in experiments/results/Trainer_test.
 3. Copy the folder path like this experiments/results/Trainer_test/seed[xx]_[date_time]
 4. Paste these 3 paths in train_config.yaml in their spots named plot_seed_1, plot_seed_2, plot_seed_3
+4. Also paste one path in plot_learning_rate to get the learning_rate_graph.
 5. activate your venv using the command [source ~/my_venv/bin/activate]
 6. Run the command [python scripts/plotting/plot_gradient_norm.py]
 7. In experiments/results/Trainer_test there is now a file named metrics.png. There you can find the plots.
