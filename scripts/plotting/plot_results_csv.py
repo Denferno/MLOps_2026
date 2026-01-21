@@ -16,14 +16,23 @@ def parse_args():
 def load_data(file_path: Path) -> pd.DataFrame:
     # TODO: Load CSV into Pandas DataFrame
     df = pd.read_csv(file_path)
-    df.columns = ['epoch', 'train_loss', 'train_accuracy', 'train_f1', 'val_avg_loss', 'val_accuracy', 'val_f1', 'grad_norm', 'learning_rate']
+    df.columns = [
+        "epoch",
+        "train_loss",
+        "train_accuracy",
+        "train_f1",
+        "val_avg_loss",
+        "val_accuracy",
+        "val_f1",
+        "grad_norm",
+        "learning_rate",
+    ]
     return df
 
 
 def setup_style():
     # TODO: Set seaborn theme
     plt.style.use("default")
-
 
 
 def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
@@ -42,13 +51,13 @@ def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     axes[0, 0].set_title("Loss")
     axes[0, 0].legend()
 
-    # TODO: Plot Train/Val Accuracy 
+    # TODO: Plot Train/Val Accuracy
     axes[0, 1].plot(df["epoch"], df["train_accuracy"], label="Train Acc")
     axes[0, 1].plot(df["epoch"], df["val_accuracy"], label="Val Acc")
     axes[0, 1].set_title("Accuracy")
     axes[0, 1].legend()
 
-    # TODO: Plot Learning Rate 
+    # TODO: Plot Learning Rate
     axes[1, 0].plot(df["epoch"], df["learning_rate"], label="LR")
     axes[1, 0].set_title("Learning Rate")
     axes[1, 0].legend()
@@ -57,12 +66,13 @@ def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     axes[1, 1].axis("off")
 
     plt.tight_layout()
-    
+
     if output_path:
         output_path.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_path / "metrics.png")
     else:
         plt.show()
+
 
 def main():
     args = parse_args()

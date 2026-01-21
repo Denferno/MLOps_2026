@@ -2,10 +2,9 @@ import argparse
 from pathlib import Path
 
 import torch
-from PIL import Image
 import torchvision.transforms as T
-
 from ml_core.models import MLP
+from PIL import Image
 
 
 def load_model_from_checkpoint(checkpoint_path: Path, device: torch.device):
@@ -37,9 +36,15 @@ def preprocess_image(image_path: Path):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run inference with a saved MLP checkpoint.")
-    parser.add_argument("--checkpoint", type=Path, required=True, help="Path to checkpoint .pt/.pth")
-    parser.add_argument("--image", type=Path, required=True, help="Path to an image (png/jpg)")
+    parser = argparse.ArgumentParser(
+        description="Run inference with a saved MLP checkpoint."
+    )
+    parser.add_argument(
+        "--checkpoint", type=Path, required=True, help="Path to checkpoint .pt/.pth"
+    )
+    parser.add_argument(
+        "--image", type=Path, required=True, help="Path to an image (png/jpg)"
+    )
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

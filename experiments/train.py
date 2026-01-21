@@ -15,8 +15,6 @@ def main(args):
     config = load_config(args.config)
     seed_everything(config["seed"])
 
-    
-
     # 2. Setup Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Your using {device}")
