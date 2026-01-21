@@ -61,9 +61,9 @@ Wanneer je GPU (CUDA) gebruikt, dan gebruikt PyTorch niet deterministische algor
 
 4. **Twin Run Results:**
 
-![identiek resultaat](img/metrics_dennis.png)
+![identiek resultaat](assets/img/metrics_dennis.png)
 
-![identiek resultaat](img/metrics_lawrence.png)
+![identiek resultaat](assets/img/metrics_lawrence.png)
 
 ---
 
@@ -179,12 +179,46 @@ We hebben de SURF MLops github als foundation gekozen omdat die natuurlijk compl
 
 2. **Collaborative Flow:**
 
+![github](assets/img/github_checks_passed.png)
+
+![github](assets/img/comments_passed.png)
+
+
+
 3. **CI Audit:**
+Als we gewoon normaal `pip install torch`doen installeren we de GPU-versie. Dan probeert hij de GPU software te vinden, die niet aanwezig is waardoor de code crasht. Daarom pip install torch met cpu, want je hebt hiervoor geen GPU nodig en cpu test zijn ook gratis. 
+
+Zonder CI dan als een teamgenoot een wijziging maakt bijvoorbeeld een directe merge dan gaat de code kapot en heeft iedereen dat probleem, maar met CI dan als teamgenoot een wijzing maakt, dan test CI het gelijk en mergt hij het alleen als alles werkt. Dus bijvoorbeeld als iemand bijvoorbeeld de return formaat wijzigt, dan faalt de test gelijk door automatische detectie van PCAMdataset breaks.  
 
 4. **Merge Conflict Resolution:**
 Ik probeerde eerst `git remote add surf` en vervolgens `git fetch`. Toen had ik veel merge conflicts. Ik deed in mijn terminal `git status` en zag ik veel merge conflicts had. Ik probeerde het op te lossen de terminal eerst met `git mergetool`, maar ik wist niet precies hoe dat werkte. Daarom had ik het opgelost in visual studio code, maar ik had geen idee of ik het goed had gedaan. Ik had namelijk alle incoming geaccepteerd. Toen wilde ik checken of alle files van https://github.com/SURF-ML/MLOps_2026 overeenkwam met onze repository. Dus ik dacht dan doe ik opnieuw git fetch surf, maar het was "already up to date" . Toen probeerde ik git push origin main --force en nu is mijn eigen werk van assigment 1 weg. 
 
+Ik kreeg een merge conflict, want ik had gecommit en gemerged zonder te pullen. Hierdoor waren we 25 commits achter de main branch, we hebben we veel dingen geprobeerd zoals `git reset --soft HEAD~1` en `git reset --hard origin/main`, maar nog steeds kregen we errors. Uiteindelijk na een kwartiertje proberen, heb ik mijn repo gedelete en opnieuw gecloned. Vervolgens heb ik mijn veranderingen erin gekopieerd en geplakt handmatig. 
+
 5. **Branching Discipline:**
+```bash
+*-.   bcf563f (refs/stash) On main: kleineplot veranderingen
+|\ \  
+| | * f5abf58 untracked files on main: 887a569 train.py path+ best_checkpoint
+| * 6cdd14a index on main: 887a569 train.py path+ best_checkpoint
+|/  
+* 887a569 (HEAD -> main, origin/main, origin/HEAD) train.py path+ best_checkpoint
+| * a3aac49 (origin/feature-plotting, feature-plotting) added gradient plot
+|/  
+* 517e80a trainer.py: def loader
+* d5f0035 TODO plot_results_csv.py done
+* ed3074f trainer.py : all_grads reverse
+* a013317 trainer.py : niet delen door 0, typehints, checkpoint,self.best..
+* ff7547a benchmark.py aangemaakt
+| * 77c3e6c (origin/script-benchmark) ẗest aanmaken py file
+|/  
+* 0beaf21 2.5
+*   d6e3194 Merge branch 'bug/gradient_norm'
+|\  
+| * 3c1cae4 (origin/bug/gradient_norm) tracker.py tracking all the gradients for each epoch.
+| * 3af17b6 tracker.py grad_norm changed to avg_grad_norm
+```
+Wij hebben een non linear history. Wij hebben gebruik gemaakt van branching, merging en prs en is dus geen flat single line. Ideaal wil je een linear history met iedere commit via pull request gereviewed en features in aparte branches
 
 ---
 
