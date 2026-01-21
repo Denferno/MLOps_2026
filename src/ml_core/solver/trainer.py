@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List
 
 import torch
 import torch.nn as nn
@@ -39,6 +39,7 @@ class Trainer:
             patience=self.config["training"]["patience"],
             min_lr=self.config["training"]["min_lr"],
         )
+        self.best_val_loss = float("inf")
 
         # TODO: Initialize metric calculation (like accuracy/f1-score) if needed
         self.train_loss = 0.0
@@ -55,7 +56,7 @@ class Trainer:
 
     def train_epoch(
         self, dataloader: DataLoader, epoch_idx: int
-    ) -> Tuple[float, float, float]:
+    ) -> Tuple[float, float, float, float, List[float]]:
         self.model.train()
 
         # reset epoch stats
@@ -112,10 +113,10 @@ class Trainer:
             all_pred.extend(preds.detach().cpu().numpy())
             all_labels.extend(label.cpu().numpy())
 
-        avg_loss = running_loss / total_samples
-        accuracy = total_correct / total_samples
+        avg_loss = running_loss / max(1, total_samples)
+        accuracy = total_correct / max(1, total_samples)
         f1 = f1_score(all_labels, all_pred, average="binary")
-        avg_grad = total_grad / batch_count
+        avg_grad = total_grad / max(1, batch_count)
 
         return avg_loss, accuracy, f1, avg_grad, all_grads
 
@@ -159,10 +160,9 @@ class Trainer:
                 all_pred.extend(preds.cpu().numpy())
                 all_labels.extend(label.cpu().numpy())
 
-        avg_loss = running_loss / total_samples
-        accuracy = total_correct / total_samples
+        avg_loss = running_loss / max(1, total_samples)
+        accuracy = total_correct / max(1, total_samples)
         f1 = f1_score(all_labels, all_pred, average="binary")
-
         return avg_loss, accuracy, f1
 
     def save_checkpoint(self, epoch: int, val_loss: float) -> None:
@@ -174,10 +174,12 @@ class Trainer:
             "val_loss": float(val_loss),
             "config": self.config,
         }
-        torch.save(checkpoints, "checkpoint.pt")
+        path = self.tracker.get_checkpoint_path("checkpoint_best.pt")
+        torch.save(checkpoints, path)
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
         epochs = self.config["training"]["epochs"]
+        
 
         print(f"Starting training for {epochs} epochs...")
 
@@ -206,16 +208,18 @@ class Trainer:
                     "train_loss": train_avg_loss,
                     "train_accuracy": train_acc,
                     "train_f1": train_f1,
-                    "val_avg_loss": val_avg_loss,
+                    "val_loss": val_avg_loss,
                     "val_accuracy": val_acc,
                     "val_f1": val_f1,
                     "avg_grad_norm": avg_grad,
-                    "all_grads": all_grads,
+                    "max_grad_norm": max(all_grads) if all_grads else 0.0,
                     "learning_rate": lr_after,
                 },
             )
             # TODO: Save checkpoints
-            self.save_checkpoint(epoch, val_avg_loss)
+            if val_avg_loss < self.best_val_loss:
+                self.best_val_loss = val_avg_loss
+                self.save_checkpoint(epoch, val_avg_loss)
         self.tracker.close()
 
 
