@@ -62,6 +62,8 @@ class Trainer:
         running_loss = 0.0
         total_correct = 0
         total_samples = 0
+        total_grad = 0.0
+        batch_count = 0
         all_pred = []
         all_labels = []
 
@@ -90,7 +92,10 @@ class Trainer:
                 max_norm=self.config["training"]["max_grad_norm"],
                 norm_type=2,
             )
+
             grad_norm = total_norm.item()
+            total_grad += grad_norm
+            batch_count += 1
             # optimization
             self.optimizer.step()
 
@@ -107,8 +112,9 @@ class Trainer:
         avg_loss = running_loss / total_samples
         accuracy = total_correct / total_samples
         f1 = f1_score(all_labels, all_pred, average="binary")
+        avg_grad = total_grad / batch_count
 
-        return avg_loss, accuracy, f1, grad_norm
+        return avg_loss, accuracy, f1, avg_grad
 
     def validate(
         self, dataloader: DataLoader, epoch_idx: int
