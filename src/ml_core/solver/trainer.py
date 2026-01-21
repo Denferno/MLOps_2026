@@ -176,6 +176,12 @@ class Trainer:
         }
         path = self.tracker.get_checkpoint_path("checkpoint_best.pt")
         torch.save(checkpoints, path)
+    #loader toegevoegd
+    def load_checkpoint(self, path: str) -> Dict[str, Any]:
+        ckpt = torch.load(path, map_location=self.device)
+        self.model.load_state_dict(ckpt["model_state_dict"])
+        self.optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        return ckpt
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
         epochs = self.config["training"]["epochs"]
