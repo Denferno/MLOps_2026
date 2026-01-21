@@ -14,6 +14,8 @@ plot:
   plot_seed_2: ""
   plot_seed_3: ""
 
+  plot_learning_rate: ""
+
 checkpoint:
   checkpoint_source: 
   checkpoint_check: Flase

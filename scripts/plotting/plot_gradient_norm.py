@@ -45,20 +45,41 @@ def plot_gradient(config, output_path):
     for i, all_grads in enumerate(data_1[:3]):
         axes[0, 0].plot(range(len(all_grads)), all_grads, label=f"Epoch {i + 1}")
     axes[0, 0].set_title(f"Gradient Norm seed {seed_1}")
+    axes[0, 0].set_xlabel("Steps")
+    axes[0, 0].set_ylabel("Gradient norm")
     axes[0, 0].legend()
 
     for i, all_grads in enumerate(data_2[:3]):
         axes[0, 1].plot(range(len(all_grads)), all_grads, label=f"Epoch {i + 1}")
     axes[0, 1].set_title(f"Gradient Norm seed {seed_2}")
+    axes[0, 1].set_xlabel("Steps")
+    axes[0, 1].set_ylabel("Gradient norm")
     axes[0, 1].legend()
 
     for i, all_grads in enumerate(data_3[:3]):
         axes[1, 0].plot(range(len(all_grads)), all_grads, label=f"Epoch {i + 1}")
     axes[1, 0].set_title(f"Gradient Norm seed {seed_3}")
+    axes[1, 0].set_xlabel("Steps")
+    axes[1, 0].set_ylabel("Gradient norm")
     axes[1, 0].legend()
 
-    # Hide empty subplot
-    axes[1, 1].axis("off")
+
+    path_lr = config["plot"]["plot_learning_rate"]
+    plot_lr_data = f"{path_lr}/metrics.csv"
+    seed_config_lr_path = f"{path_lr}/config.yaml"
+
+    df_lr = pd.read_csv(plot_lr_data)
+
+    with open(seed_config_lr_path, "r") as f:
+        seed_config_lr = yaml.safe_load(f)
+    seed_lr = seed_config_lr["seed"]
+
+    axes[1, 1].plot(df_lr["epoch"], df_lr["learning_rate"], label=f"seed {seed_lr}")
+    axes[1, 1].set_title(f"learning rate")
+    axes[1, 1].set_xlabel("Epoch")
+    axes[1, 1].set_ylabel("Learning Rate")
+    axes[1, 1].legend()
+    
 
     plt.tight_layout()
 
