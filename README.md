@@ -35,6 +35,15 @@ Instruction for running train.py.
 9. sbatch mijn_job.sbatch
 10. cat traineroutput_[numbers].out
 
+Instruction for running plot_gradient_norm.py:
+1. run 3 sbatch script with different seeds every time. Change the seed in train_config.yaml
+2. After this there are 3 folders in experiments/results/Trainer_test.
+3. Copy the folder path like this experiments/results/Trainer_test/seed[xx]_[date_time]
+4. Paste these 3 paths in train_config.yaml in their spots named plot_seed_1, plot_seed_2, plot_seed_3
+5. activate your venv using the command [source ~/my_venv/bin/activate]
+6. Run the command [python scripts/plotting/plot_gradient_norm.py]
+7. In experiments/results/Trainer_test there is now a file named metrics.png. There you can find the plots.
+
 Installation
 
  Local 
