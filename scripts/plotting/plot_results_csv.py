@@ -1,9 +1,11 @@
 import argparse
+import ast
 from pathlib import Path
 from typing import Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from ml_core.utils import load_config
 
 
 def parse_args():
@@ -42,6 +44,8 @@ def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     if df.empty:
         return
 
+    config = load_config("experiments/configs/train_config.yaml")
+    print(config["plot"]["plot_seed_1"])
     # Create a figure with subplots
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
 
@@ -57,10 +61,18 @@ def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     axes[0, 1].set_title("Accuracy")
     axes[0, 1].legend()
 
-    # TODO: Plot Learning Rate
-    axes[1, 0].plot(df["epoch"], df["learning_rate"], label="LR")
-    axes[1, 0].set_title("Learning Rate")
+    # TODO: Plot Gradient Norm
+    df["all_grads"] = df["all_grads"].apply(ast.literal_eval)
+
+    for i, all_grads in enumerate(df["all_grads"][:3]):
+        axes[1, 0].plot(range(len(all_grads)), all_grads, label=f"Epoch {i + 1}")
+    axes[1, 0].set_title("Gradient Norm")
     axes[1, 0].legend()
+
+    # TODO: Plot Learning Rate
+    axes[1, 1].plot(df["epoch"], df["learning_rate"], label="LR")
+    axes[1, 1].set_title("Learning Rate")
+    axes[1, 1].legend()
 
     # Hide empty subplot
     axes[1, 1].axis("off")
