@@ -90,7 +90,7 @@ resultaten waarschijnlijk meer de positieve kant op gaan leunen. Test methode om
 In de originele PCAM wordt er HDF5 formaat gebruikt met betere compressie, terwijl er in de andere PNG/JPEG worden gebruikt met minder efficiente compressie. Daarnaast gebruikt HDF5 formaat chunked compression en cross file optimalisatie, terwijl PNG gebruik maakt van meer eenvoudige algoritmes. Ook heeft PNG/JPEG headers en metadeta waardoor de bestanden ook groter zijn, terwijl HDF5 dat niet heeft.
 Wat we kunnen doen ertegen is terug naar de formaat van HDF5 comprimeren.
 5. **Poisoning Analysis:**
-PCAM is dus aangepast om 
+PCAM is dus aangepast om expres een poisoning method te hebben. De method die het waarschijnlijkst is zou zijn dat er gebruik gemaakt wordt van data dat niet realistisch is of beschadigd. Dat zorgt er voor dat het model moeilijker kan leren. Dit wordt ook versterkt doordat er geen duidelijke indicatie is dat er een echte 'attack' op de PCAM is uitgevoerd, wat ook een andere optie zou kunnen zijn.
 ---
 
 ## Question 3: Configuration Management
