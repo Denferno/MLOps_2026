@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter()
 
+
 class ExperimentTracker:
     def __init__(
         self,
@@ -20,9 +21,9 @@ class ExperimentTracker:
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         # TODO: Save config to yaml in run_dir
-        config_path = self.run_dir / 'config.yaml'
+        config_path = self.run_dir / "config.yaml"
 
-        with open(config_path, 'w') as file:
+        with open(config_path, "w") as file:
             yaml.dump(config, file)
 
         self.writer = SummaryWriter(log_dir=str(self.run_dir / "tb"))
@@ -31,9 +32,21 @@ class ExperimentTracker:
         self.csv_path = self.run_dir / "metrics.csv"
         self.csv_file = open(self.csv_path, "w", newline="")
         self.csv_writer = csv.writer(self.csv_file)
-        
+
         # Header (TODO: add the rest of things we want to track, loss, gradients, accuracy etc.)
-        self.csv_writer.writerow(["epoch", "train_loss", "train_accuracy", "train_f1", "val_avg_loss","val_accuracy","val_f1","grad_norm",""]) 
+        self.csv_writer.writerow(
+            [
+                "epoch",
+                "train_loss",
+                "train_accuracy",
+                "train_f1",
+                "val_avg_loss",
+                "val_accuracy",
+                "val_f1",
+                "grad_norm",
+                "",
+            ]
+        )
 
     def log_metrics(self, epoch: int, metrics: Dict[str, float]):
         """
@@ -41,12 +54,19 @@ class ExperimentTracker:
         """
         # TODO: Write other useful metrics to CSV
         row = [epoch]
-        for column in ["train_loss", "train_accuracy", "train_f1", 
-                      "val_avg_loss", "val_accuracy", "val_f1", 
-                      "grad_norm", "learning_rate"]:
+        for column in [
+            "train_loss",
+            "train_accuracy",
+            "train_f1",
+            "val_avg_loss",
+            "val_accuracy",
+            "val_f1",
+            "grad_norm",
+            "learning_rate",
+        ]:
             row.append(metrics.get(column, ""))
 
-        self.csv_writer.writerow(row) # Currently only logging epoch
+        self.csv_writer.writerow(row)  # Currently only logging epoch
         self.csv_file.flush()
 
         # TODO: Log to TensorBoard
