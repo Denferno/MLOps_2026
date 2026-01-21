@@ -1,3 +1,4 @@
+from datetime import datetime
 import csv
 from pathlib import Path
 from typing import Any, Dict
@@ -7,8 +8,6 @@ import yaml
 # TODO: Add TensorBoard Support
 from torch.utils.tensorboard import SummaryWriter
 
-writer = SummaryWriter()
-
 
 class ExperimentTracker:
     def __init__(
@@ -17,7 +16,10 @@ class ExperimentTracker:
         config: Dict[str, Any],
         base_dir: str = "experiments/results",
     ):
-        self.run_dir = Path(base_dir) / experiment_name
+        seed = config.get("seed", "NA")
+        run_tag = datetime.now().strftime("%b%d_%H-%M-%S")
+        self.run_dir = Path(base_dir) / experiment_name / f"seed{seed}_{run_tag}"
+
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         # TODO: Save config to yaml in run_dir
@@ -34,19 +36,13 @@ class ExperimentTracker:
         self.csv_writer = csv.writer(self.csv_file)
 
         # Header (TODO: add the rest of things we want to track, loss, gradients, accuracy etc.)
-        self.csv_writer.writerow(
-            [
-                "epoch",
-                "train_loss",
-                "train_accuracy",
-                "train_f1",
-                "val_avg_loss",
-                "val_accuracy",
-                "val_f1",
-                "grad_norm",
-                "",
-            ]
-        )
+        self.csv_writer.writerow([
+        "epoch", "train_loss", "train_accuracy", "train_f1",
+        "val_avg_loss", "val_accuracy", "val_f1",
+        "grad_norm", "learning_rate"
+            
+        ])
+
 
     def log_metrics(self, epoch: int, metrics: Dict[str, float]):
         """
