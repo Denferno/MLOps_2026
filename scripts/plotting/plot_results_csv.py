@@ -26,8 +26,7 @@ def load_data(file_path: Path) -> pd.DataFrame:
         "val_avg_loss",
         "val_accuracy",
         "val_f1",
-        "avg_grad_norm",
-        "all_grads",
+        "grad_norm",
         "learning_rate",
     ]
     return df

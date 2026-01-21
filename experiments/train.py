@@ -39,12 +39,19 @@ def main(args):
 
     # 6. Trainer & Fit
     trainer = Trainer(model=model, optimizer=optimizer, config=config, device=device)
+    if args.resume:
+        ckpt = trainer.load_checkpoint(args.resume)
+        logger.info(
+            f"Loaded checkpoint: {args.resume} (epoch={ckpt.get('epoch')}, val_loss={ckpt.get('val_loss')})"
+        )
+
     trainer.fit(train_loader, val_loader)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a Simple MLP on PCAM")
     parser.add_argument("--config", type=str, required=True, help="Path to config yaml")
+    parser.add_argument("--resume", type=str, default=None, help="Path to checkpoint")
     args = parser.parse_args()
 
     main(args)
