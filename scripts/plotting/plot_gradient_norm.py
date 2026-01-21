@@ -4,6 +4,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
+
 from ml_core.utils import load_config
 
 
@@ -63,7 +64,6 @@ def plot_gradient(config, output_path):
     axes[1, 0].set_ylabel("Gradient norm")
     axes[1, 0].legend()
 
-
     path_lr = config["plot"]["plot_learning_rate"]
     plot_lr_data = f"{path_lr}/metrics.csv"
     seed_config_lr_path = f"{path_lr}/config.yaml"
@@ -75,11 +75,10 @@ def plot_gradient(config, output_path):
     seed_lr = seed_config_lr["seed"]
 
     axes[1, 1].plot(df_lr["epoch"], df_lr["learning_rate"], label=f"seed {seed_lr}")
-    axes[1, 1].set_title(f"learning rate")
+    axes[1, 1].set_title("learning rate")
     axes[1, 1].set_xlabel("Epoch")
     axes[1, 1].set_ylabel("Learning Rate")
     axes[1, 1].legend()
-    
 
     plt.tight_layout()
 

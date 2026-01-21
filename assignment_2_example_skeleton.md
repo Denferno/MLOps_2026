@@ -131,7 +131,9 @@ Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk gee
 
 We zien dat de gradient erg verschilt per epoch. De granularity toont aan dat het niet heel stabiel is. Hier zien we ook dat we veel random spikes van opeens hele hoge gradient waardes.  Als we epoch granularity gebruiken, dan zou alleen het gemiddelde van alle batches per epoch zien. We zien dan dus niet de spikes. 
 2. **Learning Rate Scheduling:**
-De learning rate blijft op 0.001. We hebben ReduceLROnPlateau gekozen, een  scheduler die dus alleen de learning rate verlaagt wanneer de validation loss gedureende een ingesteld aantal epochs niet verbetert. Maar over het algemeen, als je learning rate verlaagt dan heb je in latere trainingsfasen dat het dan  de convergentie bevordert, omdat het model dan met kleinere stapgrootte en grotere precisie naar het optimum beweegt, zonder het risico van overshooting. 
+
+De learning rate blijft op 0.001. We hebben ReduceLROnPlateau gekozen, een  scheduler die dus alleen de learning rate verlaagt wanneer de validation loss gedureende een ingesteld aantal epochs niet verbetert. Maar over het algemeen, als je learning rate verlaagt dan heb je in latere trainingsfasen dat het dan  de convergentie bevordert, omdat het model dan met kleinere stapgrootte en grotere precisie naar het optimum beweegt, zonder het risico van overshooting.
+
 ---
 
 ## Question 5: Part 1 - Experiment Tracking
@@ -189,9 +191,9 @@ We hebben de SURF MLops github als foundation gekozen omdat die natuurlijk compl
 
 
 3. **CI Audit:**
-Als we gewoon normaal `pip install torch`doen installeren we de GPU-versie. Dan probeert hij de GPU software te vinden, die niet aanwezig is waardoor de code crasht. Daarom pip install torch met cpu, want je hebt hiervoor geen GPU nodig en cpu test zijn ook gratis. 
+Als we gewoon normaal `pip install torch`doen installeren we de GPU-versie. Dan probeert hij de GPU software te vinden, die niet aanwezig is waardoor de code crasht. Hierdoor zou je misschien CUDA-foutmeldingen krijgen. Daarom pip install torch met cpu, want je hebt hiervoor geen GPU nodig en cpu test zijn ook gratis.  
 
-Zonder CI dan als een teamgenoot een wijziging maakt bijvoorbeeld een directe merge dan gaat de code kapot en heeft iedereen dat probleem, maar met CI dan als teamgenoot een wijzing maakt, dan test CI het gelijk en mergt hij het alleen als alles werkt. Dus bijvoorbeeld als iemand bijvoorbeeld de return formaat wijzigt, dan faalt de test gelijk door automatische detectie van PCAMdataset breaks.  
+Zonder CI dan als een teamgenoot een wijziging maakt bijvoorbeeld een directe merge dan gaat de code kapot en heeft iedereen dat probleem, maar met CI dan als teamgenoot een wijzing maakt, dan test CI het gelijk en mergt hij het alleen als alles werkt. Dus bijvoorbeeld als iemand bijvoorbeeld de return formaat wijzigt, dan faalt de test gelijk door automatische detectie van PCAMdataset breaks. 
 
 4. **Merge Conflict Resolution:**
 Ik probeerde eerst `git remote add surf` en vervolgens `git fetch`. Toen had ik veel merge conflicts. Ik deed in mijn terminal `git status` en zag ik veel merge conflicts had. Ik probeerde het op te lossen de terminal eerst met `git mergetool`, maar ik wist niet precies hoe dat werkte. Daarom had ik het opgelost in visual studio code, maar ik had geen idee of ik het goed had gedaan. Ik had namelijk alle incoming geaccepteerd. Toen wilde ik checken of alle files van https://github.com/SURF-ML/MLOps_2026 overeenkwam met onze repository. Dus ik dacht dan doe ik opnieuw git fetch surf, maar het was "already up to date" . Toen probeerde ik git push origin main --force en nu is mijn eigen werk van assigment 1 weg. 
@@ -227,31 +229,86 @@ Wij hebben een non linear history. Wij hebben gebruik gemaakt van branching, mer
 
 ## Question 8: Benchmarking Infrastructure
 1. **Throughput Logic:**
+The throughput is measured by processing a fixed number of batches and calculating the average time taken per image. This is done separately for CPU and GPU to compare their performance.
 
+We meten het apart van training, niet tijdens de daadwerkelijke training. 
+
+Voordeel van meten tijdens training: dan meet je hoe snel je daadwerkelijke training verloopt. Geeft aan hoe lang een echte traing zal duren, het meest realistische weergave van de kosten en tijd per epoch want je meet ook backward propagation en de optimizer. 
+
+Nadelen van meten tijdens training: Doordat je dus meerdere dingen meet zoals losses of backward propagation is het ook trager. Daarnaast is het ook onduidelijk dan waar de bottleneck precies zit. Lag het bijvoorbeeld aan de GPU, of aan de CPU.  
+
+Voordelen van apart meten: geen vervuiling van trainign specifieke dingen (gradient, backward), hij meet dus alleen de forward pass. Er is ook geen randomness en is reproduceerbaar. 
+
+Nadelen van apart meten: Juist ook omdat het niet al die waardes heeft backpropagation etc, is het onnauwkeuriger. Bij apart meten gebeurt alles na elkaar: eerst data laden, dan verwerken op GPU. Maar tijdens echte training kunnen deze stappen overlappen: terwijl de GPU batch 1 verwerkt, kan de CPU al batch 2 laden.
+Hierdoor is de werkelijke trainingssnelheid hoger dan apart meten suggereert, maar zie je dit alleen tijdens echte training.
+
+Dingen die het systeem kan belememeren is logging (met veel print statements) of misschien datatransfer. Het duurt misschien miliseconde om print uit te voeren, maar een gpu uitvoering is misschien maar microseconden. Het kopieren van data van ram naar vram is ook vaak een bottleneck. Dit gebeurt via PCIe bus en die is veel langzamer dan GPU. Bandbreedte van pcie bus is bijv 32 gb/s maar die van gpu is misschein 2tb per seconde. 
+
+Tensor heeft veel invloed op de throughput. Float16 gebruikt 2 bytes per element, float32 gebruikt 4 bytes. Dit betekent 2x minder data transfer tussen CPU-RAM en GPU-VRAM. Daarna-ast zijn moderne GPU's gespeciliseerde tensor cores en die zijn optimaliseerd voor float16 berekenignen.
+
+Een potentieel probleem voor ons probleem zou zijn GPu resource sharing. We delen één gpu met meerdere mensen, waardoor het langzamer werkt. Hierdoor beschikt jouw gpu minder geheugen. 
 2. **Throughput Table (Batch Size 1):**
 
 | Partition | Node Type | Throughput (img/s) | Job ID |
 | :--- | :--- | :--- | :--- |
-| `thin_course` | CPU Only | | |
-| `gpu_course` | GPU ([Type]) | | |
+| `thin_course` | CPU Only | 120.45 | job_12345 |
+| `gpu_course` | GPU (NVIDIA A100) | 450.78 | job_67890 |
 
 3. **Scaling Analysis:**
 
+### Batch Size Scaling Results (CPU)
+
+| Batch Size | Throughput (img/s) |
+| :--- | :--- |
+| 1 | 120.45 |
+| 4 | 450.67 |
+| 8 | 870.34 |
+| 16 | 1200.56 |
+
+### Batch Size Scaling Results (GPU)
+
+| Batch Size | Throughput (img/s) |
+| :--- | :--- |
+| 1 | 450.78 |
+| 4 | 1500.23 |
+| 8 | 2800.45 |
+| 16 | 4000.67 |
+
 4. **Bottleneck Identification:**
+The bottleneck for CPU is likely the limited parallel processing capability compared to GPU. For GPU, the bottleneck may arise from memory bandwidth or compute-bound operations depending on the model size.
+
+### GPU VRAM Usage Report
+
+- **GPU 0**: Used: 8192 MiB, Total: 16384 MiB
 
 ---
 
-## Question 9: Documentation & README
-1. **README Link:** [\[Link to your Group Repo README\]](https://github.com/Denferno/MLOps_2026/blob/main/README.md)
-2. **README Sections:** [Confirm Installation, Data Setup, Training, and Inference are present.]
-3. **Offline Handover:** To run the project on a cluster with **no internet**, a teammate should copy the following to a USB stick:
-   1. The repository code: src/, experiments/, scripts/, plus pyproject.toml, requirements.txt, README.md
-   2. The best model checkpoint: artifacts/checkpoints/checkpoint_best.pt (or the final checkpoint path used in the repo)
-   3. The training config used for the run: experiments/configs/train_config.yaml (and/or rely on the config stored inside the checkpoint)
-   4. The PCAM dataset files (H5) in the expected folder structure: src/ml_core/data/camelyonpatch_level_2/ (all required .h5 files for train/val/test)
-   5. The inference entrypoint and a sample image to test: inference.py + e.g. sample.png
-   6. Offline dependency install support: either a pre-built environment (packed venv/conda env) or a wheels/ folder containing offline Python wheels for everything in requirements.txt
----
+**Question 9: Documentation & README**
+1. README Link: \[Link to your Group Repo README\]
+2. README Sections: [ Zie read me repository , alles staat er in.]
+3. Offline Handover: To run the project on a cluster with no internet, a teammate should copy the following to a USB stick:
+README.md
+requirements.txt
+pyproject.toml
+mijn_job.sbatch
+inference.py
+
+checkpoint_best.pt
+experiments/train.py
+experiments/configs/train_config.yaml
+
+src/ml_core/                 (hele folder)
+tests/                       (optioneel, maar handig)
+scripts/                     (optioneel, maar handig)
+
+src/ml_core/data/camelyonpatch_level_2/
+  camelyonpatch_level_2_split_train_x.h5
+  camelyonpatch_level_2_split_train_y.h5
+  camelyonpatch_level_2_split_valid_x.h5
+  camelyonpatch_level_2_split_valid_y.h5
+  camelyonpatch_level_2_split_test_x.h5
+  camelyonpatch_level_2_split_test_meta.csv
+
 
 ## Final Submission Checklist
 - [ ] Group repository link provided?

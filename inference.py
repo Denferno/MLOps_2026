@@ -3,8 +3,9 @@ from pathlib import Path
 
 import torch
 import torchvision.transforms as T
-from ml_core.models import MLP
 from PIL import Image
+
+from ml_core.models import MLP
 
 
 def load_model_from_checkpoint(checkpoint_path: Path, device: torch.device):
