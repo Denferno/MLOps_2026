@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
 from ml_core.data import get_dataloaders
 from ml_core.models import MLP
 
@@ -40,7 +41,7 @@ for epoch in range(3):
         epoch_train_loss += loss.item()
 
         if i % 100 == 0:  # Log-after-n-steps granularity
-            print(f"Epoch {epoch+1}, Step {i}, Loss: {loss.item():.4f}")
+            print(f"Epoch {epoch + 1}, Step {i}, Loss: {loss.item():.4f}")
 
     train_losses.append(epoch_train_loss / len(train_loader))
 
@@ -56,7 +57,7 @@ for epoch in range(3):
 
     val_losses.append(epoch_val_loss / len(val_loader))
     print(
-        f"--- Epoch {epoch+1} Summary: Train Loss {train_losses[-1]:.4f}, Val Loss {val_losses[-1]:.4f} ---"
+        f"--- Epoch {epoch + 1} Summary: Train Loss {train_losses[-1]:.4f}, Val Loss {val_losses[-1]:.4f} ---"
     )
 
 plt.figure(figsize=(10, 5))

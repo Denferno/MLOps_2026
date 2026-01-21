@@ -1,5 +1,5 @@
-from datetime import datetime
 import csv
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
@@ -36,13 +36,19 @@ class ExperimentTracker:
         self.csv_writer = csv.writer(self.csv_file)
 
         # Header (TODO: add the rest of things we want to track, loss, gradients, accuracy etc.)
-        self.csv_writer.writerow([
-        "epoch", "train_loss", "train_accuracy", "train_f1",
-        "val_avg_loss", "val_accuracy", "val_f1",
-        "grad_norm", "learning_rate"
-            
-        ])
-
+        self.csv_writer.writerow(
+            [
+                "epoch",
+                "train_loss",
+                "train_accuracy",
+                "train_f1",
+                "val_avg_loss",
+                "val_accuracy",
+                "val_f1",
+                "grad_norm",
+                "learning_rate",
+            ]
+        )
 
     def log_metrics(self, epoch: int, metrics: Dict[str, float]):
         """
