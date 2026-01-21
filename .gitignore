@@ -10,7 +10,7 @@ data/
 *.pt
 *.ckpt
 *.h5
-.sbatch
+*.sbatch
 *.out
 # 4. Ignore Secrets ( Security Risk !)
 keys.json
