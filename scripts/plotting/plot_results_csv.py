@@ -15,33 +15,54 @@ def parse_args():
 
 def load_data(file_path: Path) -> pd.DataFrame:
     # TODO: Load CSV into Pandas DataFrame
-    pass
+    df = pd.read_csv(file_path)
+    df.columns = ['epoch', 'train_loss', 'train_accuracy', 'train_f1', 'val_avg_loss', 'val_accuracy', 'val_f1', 'grad_norm', 'learning_rate']
+    return df
 
 
 def setup_style():
     # TODO: Set seaborn theme
-    pass
+    plt.style.use("default")
+
 
 
 def plot_metrics(df: pd.DataFrame, output_path: Optional[Path]):
     """
     Generate and save plots for Loss, Accuracy, and F1.
     """
-    if df is None:
+    if df.empty:
         return
 
     # Create a figure with subplots
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
 
     # TODO: Plot Train/Val Loss
+    axes[0, 0].plot(df["epoch"], df["train_loss"], label="Train Loss")
+    axes[0, 0].plot(df["epoch"], df["val_avg_loss"], label="Val Loss")
+    axes[0, 0].set_title("Loss")
+    axes[0, 0].legend()
 
-    # TODO: Plot Train/Val Accuracy
+    # TODO: Plot Train/Val Accuracy 
+    axes[0, 1].plot(df["epoch"], df["train_accuracy"], label="Train Acc")
+    axes[0, 1].plot(df["epoch"], df["val_accuracy"], label="Val Acc")
+    axes[0, 1].set_title("Accuracy")
+    axes[0, 1].legend()
 
-    # TODO: Plot Learning Rate
+    # TODO: Plot Learning Rate 
+    axes[1, 0].plot(df["epoch"], df["learning_rate"], label="LR")
+    axes[1, 0].set_title("Learning Rate")
+    axes[1, 0].legend()
+
+    # Hide empty subplot
+    axes[1, 1].axis("off")
 
     plt.tight_layout()
-    plt.show()  # or save to output_path
-
+    
+    if output_path:
+        output_path.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path / "metrics.png")
+    else:
+        plt.show()
 
 def main():
     args = parse_args()
