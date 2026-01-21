@@ -1,4 +1,5 @@
 import argparse
+
 import torch
 import torch.optim as optim
 from ml_core.data import get_dataloaders
@@ -11,7 +12,7 @@ logger = setup_logger("Experiment_Runner")
 def main(args):
     # 1. Load Config & Set Seed
     config = load_config(args.config)
-    seed = seed_everything(config['seed'])
+    seed_everything(config['seed'])
     
     # 2. Setup Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

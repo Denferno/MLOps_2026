@@ -1,13 +1,15 @@
-import time
 from typing import Any, Dict, Tuple
-from sklearn.metrics import f1_score
+
 import torch
 import torch.nn as nn
 import torch.nn.utils as utils
+from sklearn.metrics import f1_score
+from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from torch.optim import lr_scheduler
-from ..utils import ExperimentTracker, setup_logger
+
+from ..utils import ExperimentTracker
+
 
 class Trainer:
     def __init__(
