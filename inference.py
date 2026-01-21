@@ -3,8 +3,9 @@ from pathlib import Path
 
 import torch
 import torchvision.transforms as T
-from ml_core.models import MLP
 from PIL import Image
+
+from ml_core.models import MLP
 
 
 def load_model_from_checkpoint(checkpoint_path: Path, device: torch.device):
@@ -23,16 +24,16 @@ def load_model_from_checkpoint(checkpoint_path: Path, device: torch.device):
     return model
 
 
-def preprocess_image(image_path: Path):
+def preprocess_image(image_path: Path, input_shape=(3, 96, 96)):
+    _, H, W = input_shape
     tfm = T.Compose(
         [
-            T.Resize((96, 96)),
-            T.ToTensor(),
+            T.Resize((H, W)),
+            T.ToTensor(),  # -> 0..1
         ]
     )
     img = Image.open(image_path).convert("RGB")
-    x = tfm(img).unsqueeze(0)  # (1,3,96,96)
-    return x
+    return tfm(img).unsqueeze(0)
 
 
 def main():

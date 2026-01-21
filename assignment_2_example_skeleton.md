@@ -205,10 +205,15 @@ Ik probeerde eerst `git remote add surf` en vervolgens `git fetch`. Toen had ik 
 ---
 
 ## Question 9: Documentation & README
-1. **README Link:** [Link to your Group Repo README]
+1. **README Link:** [\[Link to your Group Repo README\]](https://github.com/Denferno/MLOps_2026/blob/main/README.md)
 2. **README Sections:** [Confirm Installation, Data Setup, Training, and Inference are present.]
-3. **Offline Handover:** [List the files required on a USB stick to run the model offline.]
-
+3. **Offline Handover:** To run the project on a cluster with **no internet**, a teammate should copy the following to a USB stick:
+   1. The repository code: src/, experiments/, scripts/, plus pyproject.toml, requirements.txt, README.md
+   2. The best model checkpoint: artifacts/checkpoints/checkpoint_best.pt (or the final checkpoint path used in the repo)
+   3. The training config used for the run: experiments/configs/train_config.yaml (and/or rely on the config stored inside the checkpoint)
+   4. The PCAM dataset files (H5) in the expected folder structure: src/ml_core/data/camelyonpatch_level_2/ (all required .h5 files for train/val/test)
+   5. The inference entrypoint and a sample image to test: inference.py + e.g. sample.png
+   6. Offline dependency install support: either a pre-built environment (packed venv/conda env) or a wheels/ folder containing offline Python wheels for everything in requirements.txt
 ---
 
 ## Final Submission Checklist

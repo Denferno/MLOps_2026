@@ -8,6 +8,7 @@ Lawrence Lam 15277844
 Ngawang Tsarong 15157970
 Michael Dong 15804232
 
+
 Downloading the right data:
 1. wget https://surfdrive.surf.nl/public.php/dav/files/wjRYtSborgbPF2P/?accept=zip -O pcam_data.tar src/ml_core/data
 2. cd #path
@@ -33,3 +34,13 @@ Instruction for running train.py.
 9. deactivate [optional]
 9. sbatch mijn_job.sbatch
 10. cat traineroutput_[numbers].out
+
+Installation
+
+ Local 
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .

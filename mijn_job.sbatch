@@ -8,7 +8,11 @@
 #SBATCH --time=02:00:00
 #SBATCH --output=traineroutput_%j.out
 
-cd $SLURM_SUBMIT_DIR
-source $HOME/my_venv/bin/activate
-python experiments/train.py --config experiments/configs/train_config.yaml
-PYTHONPATH=$SLURM_SUBMIT_DIR/src:$PYTHONPATH
+set -e
+cd "$SLURM_SUBMIT_DIR"
+
+source "$HOME/Groep/my_venv313/bin/activate"
+export PYTHONPATH="$SLURM_SUBMIT_DIR/src:$PYTHONPATH"
+
+python experiments/train.py --config experiments/configs/train_config.yaml \
+  --resume experiments/results/Trainer_test/checkpoint_best.pt
