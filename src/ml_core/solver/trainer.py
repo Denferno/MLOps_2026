@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, List
+from typing import Any, Dict, List, Tuple
 
 import torch
 import torch.nn as nn
@@ -176,7 +176,8 @@ class Trainer:
         }
         path = self.tracker.get_checkpoint_path("checkpoint_best.pt")
         torch.save(checkpoints, path)
-    #loader toegevoegd
+
+    # loader toegevoegd
     def load_checkpoint(self, path: str) -> Dict[str, Any]:
         ckpt = torch.load(path, map_location=self.device)
         self.model.load_state_dict(ckpt["model_state_dict"])
@@ -185,13 +186,12 @@ class Trainer:
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
         epochs = self.config["training"]["epochs"]
-        
 
         print(f"Starting training for {epochs} epochs...")
 
         for epoch in range(epochs):
             # TODO: Call train_epoch and validate
-            train_avg_loss, train_acc, train_f1, avg_grad, all_grads= self.train_epoch(
+            train_avg_loss, train_acc, train_f1, avg_grad, all_grads = self.train_epoch(
                 train_loader, epoch
             )
             val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
@@ -204,9 +204,9 @@ class Trainer:
             if lr_before != lr_after:
                 print(f"learning rate reduced from {lr_before} to {lr_after}")
             print(
-                f"Epoch {epoch+1:3d}/{epochs} | "
-                f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} Grad={avg_grad:.3f}| "
-                f"Val: L={val_avg_loss:.4f} A={val_acc*100:5.2f}% F1={val_f1:.3f}"
+                f"Epoch {epoch + 1:3d}/{epochs} | "
+                f"Train: L={train_avg_loss:.4f} A={train_acc * 100:5.2f}% F1={train_f1:.3f} Grad={avg_grad:.3f}| "
+                f"Val: L={val_avg_loss:.4f} A={val_acc * 100:5.2f}% F1={val_f1:.3f}"
             )
             self.tracker.log_metrics(
                 epoch,
