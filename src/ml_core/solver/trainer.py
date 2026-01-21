@@ -62,8 +62,11 @@ class Trainer:
         running_loss = 0.0
         total_correct = 0
         total_samples = 0
+        total_grad = 0.0
+        batch_count = 0
         all_pred = []
         all_labels = []
+        all_grads = []
 
         for image, label in tqdm(
             dataloader, desc=f"Train {epoch_idx + 1}", leave=True, position=0
@@ -90,7 +93,12 @@ class Trainer:
                 max_norm=self.config["training"]["max_grad_norm"],
                 norm_type=2,
             )
+
             grad_norm = total_norm.item()
+            total_grad += grad_norm
+            batch_count += 1
+
+            all_grads.append(grad_norm)
             # optimization
             self.optimizer.step()
 
@@ -107,8 +115,9 @@ class Trainer:
         avg_loss = running_loss / total_samples
         accuracy = total_correct / total_samples
         f1 = f1_score(all_labels, all_pred, average="binary")
+        avg_grad = total_grad / batch_count
 
-        return avg_loss, accuracy, f1, grad_norm
+        return avg_loss, accuracy, f1, avg_grad, all_grads
 
     def validate(
         self, dataloader: DataLoader, epoch_idx: int
@@ -174,7 +183,7 @@ class Trainer:
 
         for epoch in range(epochs):
             # TODO: Call train_epoch and validate
-            train_avg_loss, train_acc, train_f1, grad_norm = self.train_epoch(
+            train_avg_loss, train_acc, train_f1, avg_grad, all_grads= self.train_epoch(
                 train_loader, epoch
             )
             val_avg_loss, val_acc, val_f1 = self.validate(val_loader, epoch)
@@ -187,9 +196,9 @@ class Trainer:
             if lr_before != lr_after:
                 print(f"learning rate reduced from {lr_before} to {lr_after}")
             print(
-                f"Epoch {epoch + 1:3d}/{epochs} | "
-                f"Train: L={train_avg_loss:.4f} A={train_acc * 100:5.2f}% F1={train_f1:.3f} Grad={grad_norm:.3f}| "
-                f"Val: L={val_avg_loss:.4f} A={val_acc * 100:5.2f}% F1={val_f1:.3f}"
+                f"Epoch {epoch+1:3d}/{epochs} | "
+                f"Train: L={train_avg_loss:.4f} A={train_acc*100:5.2f}% F1={train_f1:.3f} Grad={avg_grad:.3f}| "
+                f"Val: L={val_avg_loss:.4f} A={val_acc*100:5.2f}% F1={val_f1:.3f}"
             )
             self.tracker.log_metrics(
                 epoch,
@@ -200,7 +209,8 @@ class Trainer:
                     "val_avg_loss": val_avg_loss,
                     "val_accuracy": val_acc,
                     "val_f1": val_f1,
-                    "grad_norm": grad_norm,
+                    "avg_grad_norm": avg_grad,
+                    "all_grads": all_grads,
                     "learning_rate": lr_after,
                 },
             )

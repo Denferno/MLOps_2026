@@ -45,7 +45,8 @@ class ExperimentTracker:
                 "val_avg_loss",
                 "val_accuracy",
                 "val_f1",
-                "grad_norm",
+                "avg_grad_norm",
+                "all_grads",
                 "learning_rate",
             ]
         )
@@ -63,7 +64,8 @@ class ExperimentTracker:
             "val_avg_loss",
             "val_accuracy",
             "val_f1",
-            "grad_norm",
+            "avg_grad_norm",
+            "all_grads",
             "learning_rate",
         ]:
             row.append(metrics.get(column, ""))
