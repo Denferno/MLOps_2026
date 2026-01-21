@@ -208,11 +208,11 @@ class Trainer:
                     "train_loss": train_avg_loss,
                     "train_accuracy": train_acc,
                     "train_f1": train_f1,
-                    "val_loss": val_avg_loss,
+                    "val_avg_loss": val_avg_loss,
                     "val_accuracy": val_acc,
                     "val_f1": val_f1,
                     "avg_grad_norm": avg_grad,
-                    "max_grad_norm": max(all_grads) if all_grads else 0.0,
+                    "all_grads": all_grads,
                     "learning_rate": lr_after,
                 },
             )
