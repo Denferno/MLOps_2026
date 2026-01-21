@@ -34,6 +34,6 @@ class TestMLPImplementation:
         loss.backward()
         optimizer.step()
 
-        assert not torch.equal(initial_val, param), (
-            "Weights did not update. Is the graph broken?"
-        )
+        assert not torch.equal(
+            initial_val, param
+        ), "Weights did not update. Is the graph broken?"
