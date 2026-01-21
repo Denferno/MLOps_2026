@@ -127,8 +127,11 @@ Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk gee
 ## Question 4: Gradients & LR Scheduler
 1. **Internal Dynamics:**
 
-2. **Learning Rate Scheduling:**
+![gradient](assets/img/gradient.png)
 
+We zien dat de gradient erg verschilt per epoch. De granularity toont aan dat het niet heel stabiel is. Hier zien we ook dat we veel random spikes van opeens hele hoge gradient waardes.  Als we epoch granularity gebruiken, dan zou alleen het gemiddelde van alle batches per epoch zien. We zien dan dus niet de spikes. 
+2. **Learning Rate Scheduling:**
+De learning rate blijft op 0.001. We hebben ReduceLROnPlateau gekozen, een  scheduler die dus alleen de learning rate verlaagt wanneer de validation loss gedureende een ingesteld aantal epochs niet verbetert. Maar over het algemeen, als je learning rate verlaagt dan heb je in latere trainingsfasen dat het dan  de convergentie bevordert, omdat het model dan met kleinere stapgrootte en grotere precisie naar het optimum beweegt, zonder het risico van overshooting. 
 ---
 
 ## Question 5: Part 1 - Experiment Tracking
