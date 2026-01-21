@@ -113,12 +113,12 @@ PCAM is dus aangepast om
    Voor alle 5 opgenoemde parameters gebruiken wij een file genaamd train_config.yaml and config.yaml
 
 3. **Impact Analysis:**
-   1. Reproducibility:
-      Seed, batch size, learning_rate, epochs, hidden_units. Allemaal dingen in de config file. Door het gebruik van een config file inplaats van hardcode. Blijven de parameters over alle files hetzelfde en voorkom je fouten zoals het gebruiken van verschillende values van parameters in verschillende files.
-   2. Experiment comparison:
-   Door het gebruik van een config file kan je makkelijk parameters veranderen om verschillende values te vergelijken. Wij hebben dit allemaal staan in train_config.yaml.
-   3. Collaboration:
-   Iedereen gebruikt dezelfde parameters en het zorgt ervoor dat nieuwe deelnemers gelijk de juiste values gebruiken. Ook is het meer overzichtelijker aangezien alles in één file zit. Zo hoeft je niet door de code te scrollen opzoek naar de juiste parameters value. Zo voorkom je dus ook inconsistente hard coded values
+   1. Reproducibility
+   Door het gebruik van een config file inplaats van hardcode. Blijven de parameters over alle files hetzelfde en voorkom je fouten zoals het gebruiken van verschillende values van parameters in verschillende files.
+   2. Experiment comparison
+   Door het gebruik van een config file kan je makkelijk parameters veranderen om verschillende values te vergelijken.
+   3. Collaboration
+   Iedereen gebruikt dezelfde parameters en het zorgt ervoor dat nieuwe deelnemers gelijk de juiste values gebruiken. Ook is het meer overzichtelijker als je een config file gebruikt en hoef je niet door de code te scrollen opzoek naar de juiste parameters value.
 
 4. **Remaining Risks:** 
 Gebruik van een config file lost geen menselijke error op. Zoals per ongeluk geen fixed parameter gebruiken of te late set_seeds. Verder lost het niet alle non-determenism problem op.
