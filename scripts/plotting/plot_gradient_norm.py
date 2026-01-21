@@ -4,7 +4,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
-
 from ml_core.utils import load_config
 
 
